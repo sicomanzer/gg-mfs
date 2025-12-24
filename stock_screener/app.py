@@ -95,6 +95,16 @@ def calculate_intrinsic_value(fcf, shares, growth_rate, discount_rate=0.10, term
     intrinsic_value = sum(future_values) + discounted_terminal
     return round(intrinsic_value, 2)
 
+def calculate_graham_number(eps, bvps):
+    """
+    Classic Benjamin Graham Formula (Fair Value)
+    Valuation = Sqrt(22.5 * EPS * BVPS)
+    """
+    if eps is None or bvps is None or eps <= 0 or bvps <= 0:
+        return None
+    val = (22.5 * eps * bvps) ** 0.5
+    return val
+
 def get_set100_symbols():
     """
     Reads SET100 symbols from external text file for easy updates.
@@ -138,6 +148,7 @@ def update_database():
             # Depending on yfinance version, keys might vary, but these are standard
             metrics = {
                 "symbol": symbol,
+                "sector": info.get("sector"),   # New: Industry/Sector
                 "pe": info.get("trailingPE"),
                 "roe": info.get("returnOnEquity"),
                 "pbv": info.get("priceToBook"),
@@ -146,6 +157,8 @@ def update_database():
                 "de": info.get("debtToEquity"),
                 "fcf": info.get("freeCashflow"),
                 "shares": info.get("sharesOutstanding"),
+                "eps": info.get("trailingEps"),   # For Graham Formula
+                "bvps": info.get("bookValue"),    # For Graham Formula
                 "growth": info.get("earningsGrowth"),
                 "high52": info.get("fiftyTwoWeekHigh"),
                 "ocf": info.get("operatingCashflow"),
@@ -286,22 +299,27 @@ def load_and_validate_data():
     # Note: Yield = 0 usually means no dividend, which the prompt rules as exclusion.
     
     # First ensure cols exist
-    required_cols = ["pe", "roe", "pbv", "yield", "high52", "ocf", "avg_volume", "ev_ebitda", "return_on_assets", "gross_margins"]
-    for col in required_cols:
+    # Validation Logic: strict only on CORE Magic Formula params
+    core_cols = ["pe", "roe", "pbv", "yield", "high52", "ocf"]
+    secondary_cols = ["avg_volume", "ev_ebitda", "return_on_assets", "gross_margins", "eps", "bvps", "sector", "total_assets", "total_debt", "current_ratio", "revenue_growth"]
+    
+    all_cols = core_cols + secondary_cols
+    for col in all_cols:
         if col not in df.columns:
             df[col] = None 
             
-    # Convert to numeric, forcing errors to NaN
-    for col in required_cols:
+    # Convert to numeric, forcing errors to NaN (Only for numeric cols)
+    numeric_cols = [c for c in all_cols if c != "sector"]
+    for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
         
-    # Filter
-    valid_df = df.dropna(subset=required_cols) # Drop NaN
+    # Filter: Drop only if CORE metrics are missing
+    valid_df = df.dropna(subset=core_cols) 
     
-    # Drop 0s
-    for col in required_cols:
-        valid_df = valid_df[valid_df[col] != 0]
-        
+    # Drop 0s in core metrics (some can be effectively 0 but let's stick to safe Magic Formula rules)
+    for col in ["pe", "pbv"]: # Yield can be 0, ROE can be 0 or negative
+         valid_df = valid_df[valid_df[col] != 0]
+
     # --- NEW: EARNINGS QUALITY FILTER ---
     # Must have Positive Operating Cash Flow
     # We allow None to pass if we want to be lenient, but for "Quality" we should strict.
@@ -422,6 +440,16 @@ def calculate_rankings(df):
     # formatting Drawdown
     top_30['drawdown_fmt'] = top_30['drawdown'].apply(lambda x: f"{x*100:.2f}%")
 
+    # --- INTRINSIC VALUE & MOS (New Feature) ---
+    top_30['fair_value'] = top_30.apply(lambda row: calculate_graham_number(row['eps'], row['bvps']), axis=1)
+    
+    def calc_mos(row):
+        if row['fair_value'] and row['price'] and row['fair_value'] > 0:
+            return (row['fair_value'] - row['price']) / row['fair_value']
+        return None
+
+    top_30['mos'] = top_30.apply(calc_mos, axis=1)
+    
     return top_30
 
 # --- MAIN UI ---
@@ -535,39 +563,79 @@ else:
         
         # Display cleanup
         ranked_df['ev_ebitda'] = ranked_df['ev_ebitda'].replace(999, None) 
+        
+        # Enable Right-Alignment for Percentage Columns by keeping them numeric
+        ranked_df['yield_pct'] = ranked_df['yield'] * 100
+        ranked_df['drawdown_pct'] = ranked_df['drawdown'] * 100
+        ranked_df['mos_pct'] = ranked_df['mos'].apply(lambda x: x * 100 if pd.notnull(x) else 0)
+
+        # Map Sector to Thai
+        sector_map = {
+            "Energy": "พลังงาน",
+            "Financial Services": "เงินทุน/หลักทรัพย์",
+            "Real Estate": "อสังหาริมทรัพย์",
+            "Industrials": "สินค้าอุตสาหกรรม",
+            "Basic Materials": "วัสดุก่อสร้าง/เคมีภัณฑ์",
+            "Consumer Cyclical": "สินค้าบริการ",
+            "Consumer Defensive": "สินค้าอุปโภคบริโภค",
+            "Healthcare": "การแพทย์",
+            "Utilities": "สาธารณูปโภค",
+            "Technology": "เทคโนโลยี",
+            "Communication Services": "สื่อสาร",
+            "None": "ไม่ระบุ"
+        }
+        ranked_df['sector_th'] = ranked_df['sector'].map(sector_map).fillna(ranked_df['sector']) # Use English if no map
 
         display_df = ranked_df[[
-            'symbol', 'Total_Score', 'f_score', 'price', 'drawdown_fmt', 'de', 'pe', 'pbv', 'roe', 'yield_fmt', 'ev_ebitda'
+            'symbol', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
         ]].reset_index(drop=True)
         
         display_df.index += 1 
         display_df.columns = [
-            'Symbol', 'Magic Score', 'F-Score', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'Dividend Yield', 'EV/EBITDA'
+            'Symbol', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
         ]
     
         st.dataframe(
             display_df,
             use_container_width=True,
             column_config={
+                "Symbol": st.column_config.TextColumn(width="small"),
+                "Industry": st.column_config.TextColumn(width="medium", help="กลุ่มอุตสาหกรรม (Sector)"),
                 "Magic Score": st.column_config.NumberColumn(
                     "Magic Score (Lower is Better)",
                     help="Sum of rankings for P/E, P/BV, ROE, Yield, Drawdown, and EV/EBITDA.",
-                    format="%.1f"
+                    format="%.1f",
+                    width="small"
                 ),
                 "F-Score": st.column_config.ProgressColumn(
                     "F-Score (Max 9)",
                     help="Modified Piotroski F-Score (Financial Strength). 9 is best, 0 is worst.",
                     min_value=0,
                     max_value=9,
-                    format="%d"
+                    format="%d",
+                    width="small"
                 ),
-                "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", help="Enterprise Value / EBITDA. Lower is better (Cheaper)."),
-                "Price (THB)": st.column_config.NumberColumn(format="%.2f"),
-                "Down from 52W High": st.column_config.TextColumn(help="% Drop from 52-Week High"),
-                "P/E Ratio": st.column_config.NumberColumn(format="%.2f"),
-                "P/BV Ratio": st.column_config.NumberColumn(format="%.2f"),
-                "ROE": st.column_config.NumberColumn(format="%.2f"),
-                "D/E Ratio": st.column_config.NumberColumn(format="%.2f"),
+                "Graham Fair Value": st.column_config.NumberColumn(
+                    format="%.2f", 
+                    help="Theoretical Fair Price based on Graham Number (Sqrt(22.5 * EPS * BVPS))",
+                    width="small"
+                ),
+                "M.O.S": st.column_config.ProgressColumn(
+                    "Margin of Safety",
+                    help="% Discount from Fair Value. Higher is safer.",
+                    min_value=0,
+                    max_value=100,
+                    format="%.0f%%",
+                    width="small"
+                ),
+                "Price (THB)": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "Down from 52W High": st.column_config.NumberColumn(format="%.2f%%", help="% Drop from 52-Week High", width="small"),
+                "D/E Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "P/E Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "P/BV Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "ROE": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", help="Enterprise Value / EBITDA. Lower is better (Cheaper).", width="small"),
+                "Dividend Yield": st.column_config.NumberColumn(format="%.2f%%", width="small"),
             }
         )
 
@@ -581,5 +649,19 @@ else:
         )
         
         st.markdown(f"*Showing top {len(display_df)} candidates based on the Magic Formula.*")
+        
+        st.markdown("---")
+        st.subheader("📖 คำอธิบาย (Glossary)")
+        st.markdown("""
+        *   **Magic Score:** คะแนนจัดอันดับรวมจากสูตร (ยิ่ง **น้อย** ยิ่งดี) เกิดจากการรวมอันดับของความถูก (P/E, P/BV, EV/EBITDA, Drawdown) และคุณภาพ (ROE, Yield)
+        *   **F-Score:** คะแนนสุขภาพทางการเงิน (เต็ม 9) วัดจากกำไร, หนี้สิน, และประสิทธิภาพบริษัท **(7-9 = แข็งแกร่ง)**
+        *   **Graham Fair Value:** ราคาที่เหมาะสมตามทฤษฎี Benjamin Graham (เน้นมูลค่าทางบัญชีและกำไรต่อหุ้น)
+        *   **M.O.S (Margin of Safety):** ส่วนเผื่อความปลอดภัย บอกว่าราคาปัจจุบัน **ถูกกว่า** ราคาเหมาะสมอยู่กี่ % (ยิ่งเยอะยิ่งปลอดภัย)
+        *   **P/E Ratio:** ราคาหุ้นเป็นกี่เท่าของกำไร (ยิ่งต่ำยิ่งดี) / **P/BV Ratio:** ราคาหุ้นเป็นกี่เท่าของมูลค่าทางบัญชี (ยิ่งต่ำยิ่งดี)
+        *   **ROE:** บริษัททำกำไรได้กี่ % จากเงินลงทุนของผู้ถือหุ้น (ยิ่งสูงยิ่งดี) 
+        *   **EV/EBITDA:** มูลค่ากิจการเทียบกับกำไรเงินสด (Cash Flow) เป็นค่าที่ขจัดเรื่องโครงสร้างหนี้และภาษีออกไป (ยิ่งต่ำยิ่งดี)
+        *   **D/E Ratio:** หนี้สินต่อทุน (ยิ่งต่ำยิ่งปลอดภัย ไม่ควรเกิน 1-2 เท่า)
+        *   **Down from 52W High:** ราคาลดลงจากจุดสูงสุดในรอบปีมาแล้วกี่ % (ใช้หาหุ้นที่เพิ่งลงมา)
+        """)
     else:
         st.error("No valid data points found after filtering. This might happen if Yahoo Finance data is temporarily unavailable or incomplete.")
