@@ -150,7 +150,13 @@ def update_database():
                 "high52": info.get("fiftyTwoWeekHigh"),
                 "ocf": info.get("operatingCashflow"),
                 "avg_volume": info.get("averageVolume"),
-                "ev_ebitda": info.get("enterpriseToEbitda"), # New: Value Metric
+                "ev_ebitda": info.get("enterpriseToEbitda"),
+                "total_assets": info.get("totalAssets"),        # F-Score
+                "return_on_assets": info.get("returnOnAssets"), # F-Score
+                "gross_margins": info.get("grossMargins"),      # F-Score
+                "total_debt": info.get("totalDebt"),            # F-Score
+                "current_ratio": info.get("currentRatio"),      # F-Score (Liquidity proxy)
+                "revenue_growth": info.get("revenueGrowth"),    # F-Score (Efficiency proxy)
                 "timestamp": datetime.datetime.now().isoformat()
             }
             
@@ -280,7 +286,7 @@ def load_and_validate_data():
     # Note: Yield = 0 usually means no dividend, which the prompt rules as exclusion.
     
     # First ensure cols exist
-    required_cols = ["pe", "roe", "pbv", "yield", "high52", "ocf", "avg_volume", "ev_ebitda"]
+    required_cols = ["pe", "roe", "pbv", "yield", "high52", "ocf", "avg_volume", "ev_ebitda", "return_on_assets", "gross_margins"]
     for col in required_cols:
         if col not in df.columns:
             df[col] = None 
@@ -303,6 +309,58 @@ def load_and_validate_data():
     # Now check > 0
     valid_df = valid_df[valid_df['ocf'] > 0]
     
+    # Calculate Piotroski F-Score (Simplified with available data)
+    # We use a simplified version because full history is expensive to fetch in loop
+    # 1. ROA > 0
+    # 2. CFO > 0
+    # 3. CFO > ROA (Quality of Earnings)
+    # 4. Long Term Debt < Prior Year (Proxy: Debt/Equity check low or decreasing? Hard. Skip or use simple check)
+    # 5. Current Ratio > Prior Year (Proxy: Safe Current Ratio > 1.5)
+    # 6. No New Shares (Skip)
+    # 7. Gross Margin > Prior (Proxy: Positive Gross Margin)
+    # 8. Asset Turnover > Prior (Proxy: Positive Revenue Growth)
+    
+    # Let's implement a 'Modified F-Score' based on Snapshot Data
+    def calculate_modified_f_score(row):
+        score = 0
+        try:
+            # 1. Positive ROA
+            if row['return_on_assets'] and row['return_on_assets'] > 0: score += 1
+            
+            # 2. Positive OCF
+            if row['ocf'] and row['ocf'] > 0: score += 1
+            
+            # 3. Quality of earnings (CFO > Net Income). 
+            # Note: We don't have Net Income explicit, but can imply. 
+            # Simplified: CFO / Assets > ROA
+            if row['total_assets'] and row['total_assets'] > 0:
+                cfo_roa = row['ocf'] / row['total_assets']
+                if row['return_on_assets'] and cfo_roa > row['return_on_assets']: score += 1
+            
+            # 4. Low Leverage (D/E < 1 is safe benchmark for general)
+            if row['de'] and row['de'] < 100: score += 1 # D/E is percent in our data
+            
+            # 5. Liquidity (Current Ratio > 1)
+            if row['current_ratio'] and row['current_ratio'] > 1.0: score += 1
+            
+            # 6. Improving Efficiency (Revenue Growth > 0)
+            if row['revenue_growth'] and row['revenue_growth'] > 0: score += 1
+            
+            # 7. Positive Gross Margin
+            if row['gross_margins'] and row['gross_margins'] > 0: score += 1
+            
+            # 8. Yield (Pays Dividend)
+            if row['yield'] and row['yield'] > 0: score += 1
+            
+            # 9. Low Valuation Premium (P/E < 15)
+            if row['pe'] and row['pe'] < 15: score += 1
+            
+        except:
+            pass
+        return score
+
+    valid_df['f_score'] = valid_df.apply(calculate_modified_f_score, axis=1)
+
     # Note: We allow ev_ebitda to be NaN for Banks/Financials, so we don't dropna on it strictly 
     # unless we want to force it. For now, let's keep it but fill NaN with a neutral/high value for ranking?
     # Actually, Magic Formula usually excludes Financials. 
@@ -476,15 +534,15 @@ else:
         ranked_df['de'] = ranked_df['de'].apply(lambda x: x / 100 if pd.notnull(x) else None)
         
         # Display cleanup
-        ranked_df['ev_ebitda'] = ranked_df['ev_ebitda'].replace(999, None) # Restore None for display
+        ranked_df['ev_ebitda'] = ranked_df['ev_ebitda'].replace(999, None) 
 
         display_df = ranked_df[[
-            'symbol', 'Total_Score', 'price', 'drawdown_fmt', 'de', 'pe', 'pbv', 'roe', 'yield_fmt', 'ev_ebitda'
+            'symbol', 'Total_Score', 'f_score', 'price', 'drawdown_fmt', 'de', 'pe', 'pbv', 'roe', 'yield_fmt', 'ev_ebitda'
         ]].reset_index(drop=True)
         
-        display_df.index += 1 # 1-based index
+        display_df.index += 1 
         display_df.columns = [
-            'Symbol', 'Magic Score', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'Dividend Yield', 'EV/EBITDA'
+            'Symbol', 'Magic Score', 'F-Score', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'Dividend Yield', 'EV/EBITDA'
         ]
     
         st.dataframe(
@@ -495,6 +553,13 @@ else:
                     "Magic Score (Lower is Better)",
                     help="Sum of rankings for P/E, P/BV, ROE, Yield, Drawdown, and EV/EBITDA.",
                     format="%.1f"
+                ),
+                "F-Score": st.column_config.ProgressColumn(
+                    "F-Score (Max 9)",
+                    help="Modified Piotroski F-Score (Financial Strength). 9 is best, 0 is worst.",
+                    min_value=0,
+                    max_value=9,
+                    format="%d"
                 ),
                 "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", help="Enterprise Value / EBITDA. Lower is better (Cheaper)."),
                 "Price (THB)": st.column_config.NumberColumn(format="%.2f"),
