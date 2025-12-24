@@ -152,6 +152,7 @@ def update_database():
                 "high52": info.get("fiftyTwoWeekHigh"),
                 "ocf": info.get("operatingCashflow"),
                 "evebitda": info.get("enterpriseToEbitda"),
+                "volume": info.get("averageVolume"),
                 "timestamp": datetime.datetime.now().isoformat()
             }
             
@@ -163,9 +164,14 @@ def update_database():
                 ebitda = info.get("ebitda")
                 if ev and ebitda and ebitda > 0:
                      metrics["evebitda"] = ev / ebitda
-                # If still missing, P/E could be a last resort proxy, but EV/EBITDA is distinct.
-                # We will let it be None if strict, or maybe map P/E if we really want to keep the stock.
-                # For "Investment Grade", let's be strict. If we can't value the debt (EV), we skip.
+                
+                # --- HYBRID LOGIC FOR BANKS/FINANCE ---
+                # Banks don't have EBITDA. If EV/EBITDA is still None, use P/E as proxy.
+                if metrics["evebitda"] is None and metrics["pe"] is not None:
+                    metrics["evebitda"] = metrics["pe"] # Use P/E score in the EV/EBITDA slot
+                    metrics["is_pe_proxy"] = True # Flag for UI to show (P/E)
+                else:
+                    metrics["is_pe_proxy"] = False
 
             # 2. Yield Fallback (Prioritize Calc TTM Yield from History due to YF inaccuracies on Thai stocks)
             try:
@@ -285,9 +291,9 @@ def load_and_validate_data():
     
     # First ensure cols exist
     # Switched 'pe' to 'evebitda'
-    # Need 'fcf', 'shares', 'growth' for Valuation in addition to ranking cols
+    # Need 'fcf', 'shares', 'growth', 'volume'
     required_cols = ["evebitda", "roe", "pbv", "yield", "high52", "ocf"]
-    numeric_cols = required_cols + ["fcf", "shares", "growth", "price"]
+    numeric_cols = required_cols + ["fcf", "shares", "growth", "price", "volume"]
     for col in required_cols:
         if col not in df.columns:
             df[col] = None 
@@ -306,10 +312,18 @@ def load_and_validate_data():
         
     # --- NEW: EARNINGS QUALITY FILTER ---
     # Must have Positive Operating Cash Flow
-    # We allow None to pass if we want to be lenient, but for "Quality" we should strict.
-    # Check if 'ocf' is valid (not None/NaN is already handled by dropna above)
-    # Now check > 0
-    valid_df = valid_df[valid_df['ocf'] > 0]
+    # EXCEPTION: Banks/Insurance often have negative operating cashflow due to loan issuance mechanics
+    # Ideally we check sector, but simple proxy is: if P/E Proxy was used, we might relax OCF rule
+    # OR we just stick to OCF > 0.
+    # Let's keep OCF > 0 but be aware BBL might fail it (-5B OCF).
+    # If we want banks, we might need to relax this for them.
+    # Let's try: Pass if OCF > 0 OR (is_pe_proxy is True [likely bank])
+    
+    # Ensure is_pe_proxy exists
+    if 'is_pe_proxy' not in valid_df.columns:
+        valid_df['is_pe_proxy'] = False
+        
+    valid_df = valid_df[ (valid_df['ocf'] > 0) | (valid_df['is_pe_proxy'] == True) ]
         
     valid_count = len(valid_df)
     excluded_count = total_stocks - valid_count
@@ -321,7 +335,7 @@ def calculate_rankings(df):
     Phase 3: Magic Formula Logic
     """
     # Ranking Rules
-    # EV/EBITDA: Ascending (Low is good) - Replaces P/E
+    # Valuation: Ascending (Low is good) - Hybrid (EV/EBITDA or P/E)
     df['Rank_Valuation'] = df['evebitda'].rank(ascending=True)
     
     # P/BV: Ascending (Low is good)
@@ -348,7 +362,16 @@ def calculate_rankings(df):
     top_30 = df_sorted.head(30).copy()
     
     # Rounding and Formatting
-    top_30['evebitda'] = top_30['evebitda'].round(2)
+    # Format Valuation column to show source
+    def format_val(row):
+        val = row['evebitda']
+        if pd.isna(val): return "N/A"
+        if row.get('is_pe_proxy', False):
+            return f"{val:.2f} (P/E)"
+        return f"{val:.2f}"
+
+    top_30['val_fmt'] = top_30.apply(format_val, axis=1)
+    
     top_30['pbv'] = top_30['pbv'].round(2)
     top_30['roe'] = (top_30['roe'] * 100).round(2)
     top_30['total_score'] = top_30['Total_Score'] # Keep raw score for display if needed
@@ -451,6 +474,27 @@ else:
         st.write("2. Must have **Positive Operating Cash Flow** (Earnings Quality Rule).")
         st.write("3. Must have non-zero values for key metrics.")
     
+    # --- LIQUIDITY FILTER ---
+    st.sidebar.markdown("---")
+    st.sidebar.header("💧 Filters")
+    min_vol_thb = st.sidebar.slider(
+        "Min Daily Value (THB Million)", 
+        min_value=0, max_value=50, value=3, step=1,
+        help="Filter out stocks with average daily trading value below this amount."
+    ) * 1_000_000
+    
+    # Apply Filter
+    # Avg Value = Avg Volume * Current Price
+    # We construct a temp column for this check
+    # Ensure volume and price are present
+    if 'volume' in df_clean.columns and 'price' in df_clean.columns:
+        df_clean['avg_value_thb'] = df_clean['volume'] * df_clean['price']
+        initial_count = len(df_clean)
+        df_clean = df_clean[df_clean['avg_value_thb'] >= min_vol_thb]
+        filtered_out = initial_count - len(df_clean)
+        if filtered_out > 0:
+            st.sidebar.caption(f"Filtered out {filtered_out} low liquidity stocks.")
+    
     st.markdown("---")
     
     if valid > 0:
@@ -471,12 +515,12 @@ else:
         ranked_df['de'] = ranked_df['de'].apply(lambda x: x / 100 if pd.notnull(x) else None)
 
         display_df = ranked_df[[
-            'symbol', 'Total_Score', 'price', 'drawdown_fmt', 'evebitda', 'pbv', 'roe', 'yield_fmt'
+            'symbol', 'Total_Score', 'price', 'drawdown_fmt', 'val_fmt', 'pbv', 'roe', 'yield_fmt'
         ]].reset_index(drop=True)
         
         display_df.index += 1 # 1-based index
         display_df.columns = [
-            'Symbol', 'Magic Score', 'Price (THB)', 'Down from High', 'EV/EBITDA', 'P/BV', 'ROE', 'Yield'
+            'Symbol', 'Magic Score', 'Price (THB)', 'Down from High', 'Valuation (EV/EBITDA)', 'P/BV', 'ROE', 'Yield'
         ]
         
         st.dataframe(
@@ -490,12 +534,21 @@ else:
                 ),
                 "Price (THB)": st.column_config.NumberColumn(format="%.2f"),
                 "Down from High": st.column_config.TextColumn(help="% Drop from 52-Week High"),
-                "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", help="Enterprise Value / EBITDA (Replaces P/E). Includes debt in valuation."),
+                "Valuation (EV/EBITDA)": st.column_config.TextColumn(help="Mainly EV/EBITDA. If marked (P/E), it uses P/E Ratio (for Banks/Finance)."),
                 "P/BV": st.column_config.NumberColumn(format="%.2f"),
                 "ROE": st.column_config.NumberColumn(format="%.2f"),
             }
         )
         
         st.markdown(f"*Showing top {len(display_df)} candidates based on the Magic Formula.*")
+        
+        # CSV Download
+        csv = display_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Top 30 as CSV",
+            data=csv,
+            file_name=f'magic_formula_top30_{datetime.date.today()}.csv',
+            mime='text/csv',
+        )
     else:
         st.error("No valid data points found after filtering. This might happen if Yahoo Finance data is temporarily unavailable or incomplete.")
