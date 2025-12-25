@@ -5,6 +5,7 @@ import json
 import os
 import datetime
 import time
+import altair as alt
 
 # --- CONFIGURATION ---
 DATA_FILE = "set100_db.json"
@@ -105,6 +106,18 @@ def calculate_graham_number(eps, bvps):
     val = (22.5 * eps * bvps) ** 0.5
     return val
 
+def calculate_rsi(series, period=14):
+    """
+    Relative Strength Index (RSI) Calculation
+    """
+    delta = series.diff()
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    # Use Wilder's Smoothing Strategy (alpha=1/n)
+    avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
 def get_set100_symbols():
     """
     Reads SET100 symbols from external text file for easy updates.
@@ -128,7 +141,7 @@ def get_set100_symbols():
 
 def update_database():
     """
-    Phase 1: ETL Process
+    Phase 1: ETL Process (Now with RSI!)
     """
     progress_bar = st.sidebar.progress(0)
     status_text = st.sidebar.empty()
@@ -137,7 +150,7 @@ def update_database():
     total = len(symbols)
     data_list = []
     
-    status_text.write("🚀 Starting Data Extraction...")
+    status_text.write("🚀 Starting Data Extraction (Fundamental + Technical)...")
     
     for i, symbol in enumerate(symbols):
         try:
@@ -182,25 +195,21 @@ def update_database():
                 elif info.get("trailingEps") and info.get("trailingEps") > 0 and metrics["price"]:
                     metrics["pe"] = metrics["price"] / info.get("trailingEps")
 
-            # 2. Yield Fallback (Prioritize Calc TTM Yield from History due to YF inaccuracies on Thai stocks)
+            # 2. Yield Fallback
             try:
                 divs = ticker.dividends
                 if not divs.empty:
-                    # Handle TZ awareness
                     now = pd.Timestamp.now()
                     if divs.index.tz is not None:
                         now = now.tz_localize(divs.index.tz)
-                    
                     cutoff = now - pd.Timedelta(days=365)
                     last_12m_divs = divs[divs.index >= cutoff]
                     total_div = last_12m_divs.sum()
-                    
                     if total_div > 0 and metrics["price"] and metrics["price"] > 0:
                         metrics["yield"] = total_div / metrics["price"]
             except:
                 pass
             
-            # If still None, use info fallback
             if metrics["yield"] is None:
                 div_rate = info.get("dividendRate")
                 if div_rate and metrics["price"] and metrics["price"] > 0:
@@ -211,60 +220,46 @@ def update_database():
                 try:
                     bs = ticker.balance_sheet
                     if not bs.empty:
-                        # Try finding Total Liab
                         liab = None
                         target_liab_keys = ['Total Liabilities Net Minority Interest', 'Total Liabilities']
                         for k in target_liab_keys:
                             if k in bs.index:
-                                liab = bs.loc[k][0]
+                                liab = bs.loc[k].iloc[0]
                                 break
-                        
-                        # Try finding Equity
                         equity = None
                         target_equity_keys = ['Stockholders Equity', 'Total Stockholder Equity', 'Common Stock Equity']
                         for k in target_equity_keys:
                             if k in bs.index:
-                                equity = bs.loc[k][0]
+                                equity = bs.loc[k].iloc[0]
                                 break
-                            
-                        # Calculate
                         if liab and equity and equity != 0:
-                            # Convert to Percentage to match yfinance standard
                             metrics["de"] = (liab / equity) * 100
                 except:
                     pass
 
-            # MANUAL OVERRIDES (Data source patches)
-            # Patching known values to match SET.or.th or fix missing data
+            # MANUAL OVERRIDES
             MANUAL_OVERRIDES = {
                 "SCB.BK": {"de": 618.0}, 
                 "GULF.BK": {"yield": 0.015},
-                "TFG.BK": {"yield": 0.0570}, # Manual Fix vs SET
-                "CPF.BK": {"yield": 0.0468}, # Manual Fix vs SET
-                "SIRI.BK": {"yield": 0.1112}, # Manual Fix vs SET
+                "TFG.BK": {"yield": 0.0570},
+                "CPF.BK": {"yield": 0.0468},
+                "SIRI.BK": {"yield": 0.1112},
             }
-            
             if symbol in MANUAL_OVERRIDES:
                 for key, val in MANUAL_OVERRIDES[symbol].items():
-                    # Only override if explicit value provided, OR if original missing (for GULF/SCB)
-                    # For yield fixes, we Force override
                     metrics[key] = val
 
             data_list.append(metrics)
             
         except Exception as e:
-            # Handle connection errors gracefully
             print(f"Error fetching {symbol}: {e}")
             
-        # Update UI
         progress = (i + 1) / total
         progress_bar.progress(progress)
         status_text.write(f"Fetching {symbol} ({i+1}/{total})")
         
-        # Respectful delay
         time.sleep(0.1) 
         
-    # Save to JSON
     with open(DATA_FILE, 'w') as f:
         json.dump(data_list, f, indent=4)
         
@@ -542,11 +537,10 @@ else:
         st.write("2. Must have **Positive Operating Cash Flow** (Earnings Quality Rule).")
         st.write("3. Must have non-zero values for key metrics.")
     
-    st.markdown("---")
+
     
     if valid > 0:
         # Phase 3: Rankings
-        st.subheader("🏆 Top 30 Magic Formula Stocks")
         
         ranked_df = calculate_rankings(filtered_df)
         
@@ -600,13 +594,13 @@ else:
             
             # 3. Risk (High Debt > 2.5)
             de_ratio = row['de'] if pd.notnull(row['de']) else 0
-            high_risk = de_ratio > 2.5
+            hight_risk = de_ratio > 2.5
             
-            if strong_fin and very_cheap and not high_risk:
+            if strong_fin and very_cheap and not hight_risk:
                 return "⭐⭐⭐" # Top Pick
             elif (strong_fin and cheap) or (fs >= 6 and very_cheap):
                 return "⭐⭐"     # Good
-            elif weak_fin or high_risk:
+            elif weak_fin or hight_risk:
                 return "⚠️"      # Caution
             else:
                 return "😐"      # Neutral
@@ -621,48 +615,69 @@ else:
         display_df.columns = [
             'Symbol', 'Rating', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
         ]
+
+        # --- GOD MODE: VISUALIZATION ---
+        st.markdown("---")
+        st.subheader("🔮 Magic Quadrant: แผนที่ขุมทรัพย์ 🗺️")
+        st.info("💡 **วิธีดูง่ายๆ:** ผมแบ่งโซนไว้ให้แล้วครับ! มองหาหุ้นในโซน **'สีเขียว (ซ้ายบน)'** นั่นคือ **'ของดีราคาถูก'** ที่น่าลงทุนที่สุดครับ")
+        
+        # Prepare Chart Data (Filter outliers for better chart)
+        chart_data = ranked_df[ranked_df['pe'] < 40].copy()
+        chart_data['sector_th'] = chart_data['sector_th'].fillna('Unknown')
+        
+        # 1. Base Points
+        base = alt.Chart(chart_data).encode(
+            x=alt.X('pe', title='ความถูก (P/E Ratio) ← ยิ่งซ้ายยิ่งถูก', scale=alt.Scale(domain=[0, 30], clamp=True)),
+            y=alt.Y('roe', title='คุณภาพ (ROE %) ↑ ยิ่งบนยิ่งเก่ง', scale=alt.Scale(domain=[0, 40], clamp=True))
+        )
+
+        points = base.mark_circle(size=140, opacity=0.9).encode(
+            color=alt.Color('sector_th', legend=alt.Legend(title="กลุ่มอุตสาหกรรม")),
+            tooltip=['symbol', 'price', 'pe', 'roe', 'f_score', 'rating_icon']
+        )
+
+        # 2. Quadrant Dividers (Benchmarks: P/E=15, ROE=12)
+        h_line = alt.Chart(pd.DataFrame({'y': [12]})).mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(y='y')
+        v_line = alt.Chart(pd.DataFrame({'x': [15]})).mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(x='x')
+
+        # 3. Text Labels (The "Thinking" Part)
+        labels_df = pd.DataFrame({
+            'x': [7.5, 22.5, 7.5, 22.5],
+            'y': [35, 35, 5, 5],
+            'label': ['💎 ของดีราคาถูก (Buy!)', '⭐ แพงแต่ดี (Growth)', '⚠️ ระวังกับดัก (Value Trap)', '❌ แพงและแย่ (Avoid)'],
+            'color': ['#27ae60', '#f39c12', '#e67e22', '#c0392b']
+        })
+        
+        text_labels = alt.Chart(labels_df).mark_text(
+            align='center', baseline='middle', fontSize=16, fontWeight='bold'
+        ).encode(
+            x='x', y='y', text='label', color=alt.Color('color', scale=None)
+        )
+
+        final_chart = (points + h_line + v_line + text_labels).interactive()
+        
+        st.altair_chart(final_chart, use_container_width=True)
+        st.markdown("---")
     
+        st.subheader("🏆 Top 30 Magic Formula Stocks")
         st.dataframe(
             display_df,
             use_container_width=True,
             column_config={
                 "Symbol": st.column_config.TextColumn(width="small"),
                 "Rating": st.column_config.TextColumn(width="small", help="⭐⭐⭐ = Strong F-Score & Undervalued"),
-                "Industry": st.column_config.TextColumn(width="medium", help="กลุ่มอุตสาหกรรม (Sector)"),
-                "Magic Score": st.column_config.NumberColumn(
-                    "Magic Score (Lower is Better)",
-                    help="Sum of rankings for P/E, P/BV, ROE, Yield, Drawdown, and EV/EBITDA.",
-                    format="%.1f",
-                    width="small"
-                ),
-                "F-Score": st.column_config.ProgressColumn(
-                    "F-Score (Max 9)",
-                    help="Modified Piotroski F-Score (Financial Strength). 9 is best, 0 is worst.",
-                    min_value=0,
-                    max_value=9,
-                    format="%d",
-                    width="small"
-                ),
-                "Graham Fair Value": st.column_config.NumberColumn(
-                    format="%.2f", 
-                    help="Theoretical Fair Price based on Graham Number (Sqrt(22.5 * EPS * BVPS))",
-                    width="small"
-                ),
-                "M.O.S": st.column_config.ProgressColumn(
-                    "Margin of Safety",
-                    help="% Discount from Fair Value. Higher is safer.",
-                    min_value=0,
-                    max_value=100,
-                    format="%.0f%%",
-                    width="small"
-                ),
+                "Industry": st.column_config.TextColumn(width="medium"),
+                "Magic Score": st.column_config.NumberColumn(format="%.1f", width="small"),
+                "F-Score": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d", width="small"),
+                "Graham Fair Value": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "M.O.S": st.column_config.ProgressColumn(min_value=0, max_value=100, format="%.0f%%", width="small"),
                 "Price (THB)": st.column_config.NumberColumn(format="%.2f", width="small"),
-                "Down from 52W High": st.column_config.NumberColumn(format="%.2f%%", help="% Drop from 52-Week High", width="small"),
+                "Down from 52W High": st.column_config.NumberColumn(format="%.2f%%", width="small"),
                 "D/E Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "P/E Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "P/BV Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "ROE": st.column_config.NumberColumn(format="%.2f", width="small"),
-                "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", help="Enterprise Value / EBITDA. Lower is better (Cheaper).", width="small"),
+                "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "Dividend Yield": st.column_config.NumberColumn(format="%.2f%%", width="small"),
             }
         )
@@ -693,3 +708,4 @@ else:
         """)
     else:
         st.error("No valid data points found after filtering. This might happen if Yahoo Finance data is temporarily unavailable or incomplete.")
+

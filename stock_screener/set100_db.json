@@ -2,11 +2,11 @@
     {
         "symbol": "AAV.BK",
         "sector": "Industrials",
-        "pe": 14.75,
+        "pe": 14.5,
         "roe": 0.09165,
-        "pbv": 1.252654,
+        "pbv": 1.2314225,
         "yield": null,
-        "price": 1.18,
+        "price": 1.16,
         "de": 372.59,
         "fcf": 5713961472,
         "shares": 12850000000,
@@ -23,16 +23,16 @@
         "total_debt": 45106384896,
         "current_ratio": 0.597,
         "revenue_growth": -0.352,
-        "timestamp": "2025-12-25T10:30:28.229299"
+        "timestamp": "2025-12-25T16:01:53.051895"
     },
     {
         "symbol": "ADVANC.BK",
         "sector": "Communication Services",
-        "pe": 21.65163,
+        "pe": 21.721027,
         "roe": 0.47205,
-        "pbv": 9.953106,
-        "yield": 0.04048076923076923,
-        "price": 312.0,
+        "pbv": 9.985006,
+        "yield": 0.040351437699680505,
+        "price": 313.0,
         "de": 221.353,
         "fcf": 40526041088,
         "shares": 2974209736,
@@ -49,7 +49,7 @@
         "total_debt": 206579286016,
         "current_ratio": 0.339,
         "revenue_growth": 0.041,
-        "timestamp": "2025-12-25T10:30:28.697176"
+        "timestamp": "2025-12-25T16:01:53.510583"
     },
     {
         "symbol": "AEONTS.BK",
@@ -75,16 +75,16 @@
         "total_debt": 60302258176,
         "current_ratio": 3.257,
         "revenue_growth": -0.045,
-        "timestamp": "2025-12-25T10:30:29.182352"
+        "timestamp": "2025-12-25T16:01:54.011027"
     },
     {
         "symbol": "AMATA.BK",
         "sector": "Real Estate",
-        "pe": 6.213235,
+        "pe": 6.1764703,
         "roe": 0.14846,
-        "pbv": 0.85725874,
-        "yield": 0.053254437869822494,
-        "price": 16.9,
+        "pbv": 0.8521862,
+        "yield": 0.05357142857142857,
+        "price": 16.8,
         "de": 70.41,
         "fcf": 5022490624,
         "shares": 1150000000,
@@ -101,16 +101,16 @@
         "total_debt": 20289110016,
         "current_ratio": 0.98,
         "revenue_growth": 0.198,
-        "timestamp": "2025-12-25T10:30:29.656736"
+        "timestamp": "2025-12-25T16:01:54.490431"
     },
     {
         "symbol": "AOT.BK",
         "sector": "Industrials",
-        "pe": 42.519684,
+        "pe": 42.322834,
         "roe": 0.14314,
-        "pbv": 5.893266,
-        "yield": 0.015000000000000001,
-        "price": 54.0,
+        "pbv": 5.8659825,
+        "yield": 0.015069767441860466,
+        "price": 53.75,
         "de": 38.186,
         "fcf": 11371600896,
         "shares": 14285700000,
@@ -127,7 +127,7 @@
         "total_debt": 50726039552,
         "current_ratio": 1.518,
         "revenue_growth": -0.06,
-        "timestamp": "2025-12-25T10:30:30.188359"
+        "timestamp": "2025-12-25T16:01:55.022208"
     },
     {
         "symbol": "AP.BK",
@@ -153,16 +153,16 @@
         "total_debt": 33309030400,
         "current_ratio": 4.312,
         "revenue_growth": -0.1,
-        "timestamp": "2025-12-25T10:30:30.647934"
+        "timestamp": "2025-12-25T16:01:55.493951"
     },
     {
         "symbol": "AURA.BK",
         "sector": "Consumer Cyclical",
-        "pe": 14.6,
+        "pe": 14.3,
         "roe": 0.20567,
-        "pbv": 2.833301,
-        "yield": 0.028767123287671233,
-        "price": 14.6,
+        "pbv": 2.7750826,
+        "yield": 0.02937062937062937,
+        "price": 14.3,
         "de": 175.623,
         "fcf": -4035398400,
         "shares": 1334000000,
@@ -179,16 +179,16 @@
         "total_debt": 12071374848,
         "current_ratio": 2.007,
         "revenue_growth": 0.298,
-        "timestamp": "2025-12-25T10:30:31.163327"
+        "timestamp": "2025-12-25T16:01:55.988237"
     },
     {
         "symbol": "AWC.BK",
         "sector": "Consumer Cyclical",
-        "pe": 11.1,
+        "pe": 10.900001,
         "roe": 0.06959,
-        "pbv": 0.7581967,
-        "yield": 0.03378378378378378,
-        "price": 2.22,
+        "pbv": 0.74453557,
+        "yield": 0.03440366972477064,
+        "price": 2.18,
         "de": 96.434,
         "fcf": -5100631552,
         "shares": 32012971500,
@@ -205,16 +205,16 @@
         "total_debt": 90405642240,
         "current_ratio": 0.07,
         "revenue_growth": 0.09,
-        "timestamp": "2025-12-25T10:30:31.516693"
+        "timestamp": "2025-12-25T16:01:56.329366"
     },
     {
         "symbol": "BA.BK",
         "sector": "Industrials",
-        "pe": 8.786127,
+        "pe": 8.67052,
         "roe": 0.22315,
-        "pbv": 2.2751083,
-        "yield": 0.07894736842105263,
-        "price": 15.2,
+        "pbv": 2.2451727,
+        "yield": 0.08,
+        "price": 15.0,
         "de": 179.872,
         "fcf": 2825292544,
         "shares": 2097658900,
@@ -231,16 +231,16 @@
         "total_debt": 25141735424,
         "current_ratio": 1.073,
         "revenue_growth": -0.005,
-        "timestamp": "2025-12-25T10:30:31.876076"
+        "timestamp": "2025-12-25T16:01:56.688736"
     },
     {
         "symbol": "BAM.BK",
         "sector": "Financial Services",
-        "pe": 11.521739,
+        "pe": 11.376811,
         "roe": 0.05009,
-        "pbv": 0.57322085,
-        "yield": 0.0440251572327044,
-        "price": 7.95,
+        "pbv": 0.5660105,
+        "yield": 0.044585987261146494,
+        "price": 7.85,
         "de": 196.145,
         "fcf": null,
         "shares": 3232042300,
@@ -257,16 +257,16 @@
         "total_debt": 87920918528,
         "current_ratio": 3.977,
         "revenue_growth": 0.122,
-        "timestamp": "2025-12-25T10:30:32.289031"
+        "timestamp": "2025-12-25T16:01:57.067460"
     },
     {
         "symbol": "BANPU.BK",
         "sector": "Energy",
-        "pe": 11.86251,
+        "pe": 11.767228,
         "roe": 0.0043,
-        "pbv": 0.46775597,
-        "yield": 0.048192771084337345,
-        "price": 4.98,
+        "pbv": 0.4639989,
+        "yield": 0.048582995951417,
+        "price": 4.94,
         "de": 140.208,
         "fcf": 122902872,
         "shares": 10018902725,
@@ -283,16 +283,16 @@
         "total_debt": 6908395008,
         "current_ratio": 0.97,
         "revenue_growth": 0.015,
-        "timestamp": "2025-12-25T10:30:32.657154"
+        "timestamp": "2025-12-25T16:01:57.426202"
     },
     {
         "symbol": "BBL.BK",
         "sector": "Financial Services",
-        "pe": 6.5712047,
+        "pe": 6.59082,
         "roe": 0.086210005,
-        "pbv": 0.54695123,
-        "yield": 0.050746268656716415,
-        "price": 167.5,
+        "pbv": 0.5485839,
+        "yield": 0.050595238095238096,
+        "price": 168.0,
         "de": 719.6798208138503,
         "fcf": null,
         "shares": 1908842894,
@@ -309,16 +309,16 @@
         "total_debt": 275214434304,
         "current_ratio": null,
         "revenue_growth": 0.008,
-        "timestamp": "2025-12-25T10:30:33.164556"
+        "timestamp": "2025-12-25T16:01:57.920500"
     },
     {
         "symbol": "BCH.BK",
         "sector": "Healthcare",
-        "pe": 20.19608,
+        "pe": 19.803923,
         "roe": 0.10158,
-        "pbv": 1.9864995,
-        "yield": 0.041747572815533984,
-        "price": 10.3,
+        "pbv": 1.9479268,
+        "yield": 0.04257425742574258,
+        "price": 10.1,
         "de": 8.255,
         "fcf": 1011177088,
         "shares": 2494000000,
@@ -335,7 +335,7 @@
         "total_debt": 1150963968,
         "current_ratio": 1.25,
         "revenue_growth": -0.071,
-        "timestamp": "2025-12-25T10:30:33.780008"
+        "timestamp": "2025-12-25T16:01:58.584760"
     },
     {
         "symbol": "BCP.BK",
@@ -361,16 +361,16 @@
         "total_debt": 133170561024,
         "current_ratio": 1.37,
         "revenue_growth": -0.2,
-        "timestamp": "2025-12-25T10:30:34.244436"
+        "timestamp": "2025-12-25T16:01:59.067824"
     },
     {
         "symbol": "BCPG.BK",
         "sector": "Utilities",
-        "pe": 70.0,
+        "pe": 69.0,
         "roe": 0.0101,
-        "pbv": 0.7408191,
-        "yield": 0.04,
-        "price": 7.0,
+        "pbv": 0.730236,
+        "yield": 0.04057971014492754,
+        "price": 6.9,
         "de": 99.1,
         "fcf": 738526464,
         "shares": 2995759339,
@@ -387,16 +387,16 @@
         "total_debt": 28305018880,
         "current_ratio": 1.643,
         "revenue_growth": -0.022,
-        "timestamp": "2025-12-25T10:30:34.751014"
+        "timestamp": "2025-12-25T16:01:59.607322"
     },
     {
         "symbol": "BDMS.BK",
         "sector": "Healthcare",
-        "pe": 18.942308,
+        "pe": 18.846155,
         "roe": 0.16677,
-        "pbv": 3.124009,
-        "yield": 0.03807106598984772,
-        "price": 19.7,
+        "pbv": 3.108151,
+        "yield": 0.038265306122448974,
+        "price": 19.6,
         "de": 17.913,
         "fcf": 6450612736,
         "shares": 15892001895,
@@ -413,7 +413,7 @@
         "total_debt": 18661656576,
         "current_ratio": 0.863,
         "revenue_growth": 0.002,
-        "timestamp": "2025-12-25T10:30:35.137558"
+        "timestamp": "2025-12-25T16:02:00.001613"
     },
     {
         "symbol": "BEM.BK",
@@ -439,7 +439,7 @@
         "total_debt": 103799357440,
         "current_ratio": 0.552,
         "revenue_growth": -0.011,
-        "timestamp": "2025-12-25T10:30:35.640115"
+        "timestamp": "2025-12-25T16:02:00.506846"
     },
     {
         "symbol": "BGRIM.BK",
@@ -465,16 +465,16 @@
         "total_debt": 116526596096,
         "current_ratio": 1.485,
         "revenue_growth": -0.09,
-        "timestamp": "2025-12-25T10:30:36.080652"
+        "timestamp": "2025-12-25T16:02:00.945252"
     },
     {
         "symbol": "BH.BK",
         "sector": "Healthcare",
-        "pe": 18.929806,
+        "pe": 18.527044,
         "roe": 0.27437,
-        "pbv": 4.4963784,
-        "yield": 0.030395136778115502,
-        "price": 164.5,
+        "pbv": 4.4007106,
+        "yield": 0.031055900621118012,
+        "price": 161.0,
         "de": 0.378,
         "fcf": 5496067072,
         "shares": 794964292,
@@ -491,16 +491,16 @@
         "total_debt": 111039000,
         "current_ratio": 4.721,
         "revenue_growth": 0.021,
-        "timestamp": "2025-12-25T10:30:36.449886"
+        "timestamp": "2025-12-25T16:02:01.313582"
     },
     {
         "symbol": "BJC.BK",
         "sector": "Industrials",
-        "pe": 13.577981,
+        "pe": 13.394495,
         "roe": 0.04219,
-        "pbv": 0.49742883,
-        "yield": 0.047972972972972976,
-        "price": 14.8,
+        "pbv": 0.49070683,
+        "yield": 0.04863013698630138,
+        "price": 14.6,
         "de": 129.466,
         "fcf": 15110322176,
         "shares": 4007796699,
@@ -517,16 +517,16 @@
         "total_debt": 162228027392,
         "current_ratio": 0.548,
         "revenue_growth": -0.039,
-        "timestamp": "2025-12-25T10:30:36.941562"
+        "timestamp": "2025-12-25T16:02:01.810585"
     },
     {
         "symbol": "BLA.BK",
         "sector": "Financial Services",
-        "pe": 6.030303,
+        "pe": 6.0,
         "roe": 0.108909994,
-        "pbv": 0.61327004,
-        "yield": 0.043216080402010054,
-        "price": 19.9,
+        "pbv": 0.61018825,
+        "yield": 0.04343434343434343,
+        "price": 19.8,
         "de": 554.3802011753698,
         "fcf": 5954033152,
         "shares": 1707566000,
@@ -543,16 +543,16 @@
         "total_debt": 0,
         "current_ratio": 3.102,
         "revenue_growth": 0.145,
-        "timestamp": "2025-12-25T10:30:37.415989"
+        "timestamp": "2025-12-25T16:02:02.315810"
     },
     {
         "symbol": "BTG.BK",
         "sector": "Consumer Defensive",
-        "pe": 5.3216376,
+        "pe": 5.2923975,
         "roe": 0.22976999,
-        "pbv": 1.1130818,
-        "yield": 0.027472527472527472,
-        "price": 18.2,
+        "pbv": 1.106966,
+        "yield": 0.027624309392265192,
+        "price": 18.1,
         "de": 71.028,
         "fcf": 10139326464,
         "shares": 1927372000,
@@ -569,16 +569,16 @@
         "total_debt": 23049443328,
         "current_ratio": 1.562,
         "revenue_growth": 0.022,
-        "timestamp": "2025-12-25T10:30:37.975554"
+        "timestamp": "2025-12-25T16:02:02.922160"
     },
     {
         "symbol": "BTS.BK",
         "sector": "Industrials",
-        "pe": 11.7,
+        "pe": 11.5,
         "roe": 0.026080001,
-        "pbv": 0.6538139,
+        "pbv": 0.6426376,
         "yield": null,
-        "price": 2.34,
+        "price": 2.3,
         "de": 181.862,
         "fcf": -26550534144,
         "shares": 16093803620,
@@ -595,16 +595,16 @@
         "total_debt": 189311057920,
         "current_ratio": 1.662,
         "revenue_growth": 0.437,
-        "timestamp": "2025-12-25T10:30:38.333175"
+        "timestamp": "2025-12-25T16:02:03.279071"
     },
     {
         "symbol": "CBG.BK",
         "sector": "Consumer Defensive",
-        "pe": 15.033784,
+        "pe": 14.695946,
         "roe": 0.22388001,
-        "pbv": 3.1831188,
-        "yield": 0.031460674157303366,
-        "price": 44.5,
+        "pbv": 3.111588,
+        "yield": 0.03218390804597701,
+        "price": 43.5,
         "de": 22.64,
         "fcf": 2654211328,
         "shares": 1000000000,
@@ -621,16 +621,16 @@
         "total_debt": 3159485952,
         "current_ratio": 1.29,
         "revenue_growth": 0.078,
-        "timestamp": "2025-12-25T10:30:38.813289"
+        "timestamp": "2025-12-25T16:02:03.791758"
     },
     {
         "symbol": "CCET.BK",
         "sector": "Technology",
-        "pe": 22.571428,
+        "pe": 22.0,
         "roe": 0.08849,
-        "pbv": 1.9816053,
-        "yield": 0.04219409282700422,
-        "price": 4.74,
+        "pbv": 1.9314381,
+        "yield": 0.04329004329004329,
+        "price": 4.62,
         "de": 74.002,
         "fcf": 5258414080,
         "shares": 10450002831,
@@ -647,16 +647,16 @@
         "total_debt": 18502946816,
         "current_ratio": 1.287,
         "revenue_growth": -0.099,
-        "timestamp": "2025-12-25T10:30:39.198065"
+        "timestamp": "2025-12-25T16:02:04.202103"
     },
     {
         "symbol": "CENTEL.BK",
         "sector": "Consumer Cyclical",
-        "pe": 26.6,
+        "pe": 26.4,
         "roe": 0.07798,
-        "pbv": 2.0802052,
-        "yield": 0.01774436090225564,
-        "price": 33.25,
+        "pbv": 2.0645645,
+        "yield": 0.01787878787878788,
+        "price": 33.0,
         "de": 146.401,
         "fcf": -713286720,
         "shares": 1350000000,
@@ -673,16 +673,16 @@
         "total_debt": 31893477376,
         "current_ratio": 0.471,
         "revenue_growth": 0.042,
-        "timestamp": "2025-12-25T10:30:39.695707"
+        "timestamp": "2025-12-25T16:02:04.671217"
     },
     {
         "symbol": "CHG.BK",
         "sector": "Healthcare",
-        "pe": 21.571428,
+        "pe": 21.285715,
         "roe": 0.10227,
-        "pbv": 2.1695402,
-        "yield": 0.046357615894039736,
-        "price": 1.51,
+        "pbv": 2.1408048,
+        "yield": 0.04697986577181208,
+        "price": 1.49,
         "de": 8.298,
         "fcf": 988151616,
         "shares": 11000000000,
@@ -699,16 +699,16 @@
         "total_debt": 670688000,
         "current_ratio": 2.488,
         "revenue_growth": -0.096,
-        "timestamp": "2025-12-25T10:30:40.178550"
+        "timestamp": "2025-12-25T16:02:05.184879"
     },
     {
         "symbol": "CK.BK",
         "sector": "Industrials",
-        "pe": 7.701863,
+        "pe": 7.5776396,
         "roe": 0.098120004,
-        "pbv": 0.743539,
-        "yield": 0.0282258064516129,
-        "price": 12.4,
+        "pbv": 0.7315464,
+        "yield": 0.028688524590163935,
+        "price": 12.2,
         "de": 186.817,
         "fcf": 2145060224,
         "shares": 1680355672,
@@ -725,16 +725,16 @@
         "total_debt": 53377040384,
         "current_ratio": 1.007,
         "revenue_growth": 0.164,
-        "timestamp": "2025-12-25T10:30:40.588775"
+        "timestamp": "2025-12-25T16:02:05.604850"
     },
     {
         "symbol": "COM7.BK",
         "sector": "Consumer Cyclical",
-        "pe": 12.743902,
+        "pe": 12.560976,
         "roe": 0.44373,
-        "pbv": 5.186104,
-        "yield": 0.04114832535885168,
-        "price": 20.9,
+        "pbv": 5.1116624,
+        "yield": 0.04174757281553398,
+        "price": 20.6,
         "de": 92.453,
         "fcf": 3008342016,
         "shares": 2354998265,
@@ -751,16 +751,16 @@
         "total_debt": 8979884032,
         "current_ratio": 1.183,
         "revenue_growth": 0.07,
-        "timestamp": "2025-12-25T10:30:41.058942"
+        "timestamp": "2025-12-25T16:02:06.118226"
     },
     {
         "symbol": "CPALL.BK",
         "sector": "Consumer Defensive",
-        "pe": 14.482201,
+        "pe": 14.5631075,
         "roe": 0.10186,
-        "pbv": 3.258337,
-        "yield": 0.03016759776536313,
-        "price": 44.75,
+        "pbv": 3.27654,
+        "yield": 0.030000000000000002,
+        "price": 45.0,
         "de": 133.806,
         "fcf": 33108066304,
         "shares": 8915503348,
@@ -777,7 +777,7 @@
         "total_debt": 434891849728,
         "current_ratio": 0.521,
         "revenue_growth": 0.038,
-        "timestamp": "2025-12-25T10:30:41.434531"
+        "timestamp": "2025-12-25T16:02:06.511769"
     },
     {
         "symbol": "CPF.BK",
@@ -803,16 +803,16 @@
         "total_debt": 520801091584,
         "current_ratio": 0.68,
         "revenue_growth": -0.032,
-        "timestamp": "2025-12-25T10:30:41.887781"
+        "timestamp": "2025-12-25T16:02:06.981835"
     },
     {
         "symbol": "CPN.BK",
         "sector": "Real Estate",
-        "pe": 14.070352,
+        "pe": 13.881909,
         "roe": 0.16413,
-        "pbv": 2.3823705,
-        "yield": 0.0375,
-        "price": 56.0,
+        "pbv": 2.3504636,
+        "yield": 0.03800904977375566,
+        "price": 55.25,
         "de": 102.579,
         "fcf": 33319870464,
         "shares": 4488000000,
@@ -829,7 +829,7 @@
         "total_debt": 117844074496,
         "current_ratio": 0.769,
         "revenue_growth": 0.095,
-        "timestamp": "2025-12-25T10:30:42.383807"
+        "timestamp": "2025-12-25T16:02:07.497285"
     },
     {
         "symbol": "CRC.BK",
@@ -855,16 +855,16 @@
         "total_debt": 144803414016,
         "current_ratio": 0.61,
         "revenue_growth": -0.01,
-        "timestamp": "2025-12-25T10:30:42.856961"
+        "timestamp": "2025-12-25T16:02:08.016485"
     },
     {
         "symbol": "DELTA.BK",
         "sector": "Industrials",
-        "pe": 111.3924,
+        "pe": 109.49367,
         "roe": 0.2347,
-        "pbv": 24.185791,
-        "yield": 0.0026136363636363636,
-        "price": 176.0,
+        "pbv": 23.773533,
+        "yield": 0.0026589595375722543,
+        "price": 173.0,
         "de": 2.127,
         "fcf": 377621920,
         "shares": 12473816140,
@@ -881,16 +881,16 @@
         "total_debt": 1930520960,
         "current_ratio": 2.002,
         "revenue_growth": 0.231,
-        "timestamp": "2025-12-25T10:30:43.220198"
+        "timestamp": "2025-12-25T16:02:08.397180"
     },
     {
         "symbol": "DOHOME.BK",
         "sector": "Consumer Cyclical",
-        "pe": 18.099998,
+        "pe": 17.699999,
         "roe": 0.05116,
-        "pbv": 0.9197154,
-        "yield": 0.0014616022099447513,
-        "price": 3.62,
+        "pbv": 0.8993902,
+        "yield": 0.001494632768361582,
+        "price": 3.54,
         "de": 124.155,
         "fcf": 1498574080,
         "shares": 3383286282,
@@ -907,16 +907,16 @@
         "total_debt": 16532831232,
         "current_ratio": 0.89,
         "revenue_growth": -0.087,
-        "timestamp": "2025-12-25T10:30:43.700607"
+        "timestamp": "2025-12-25T16:02:08.922248"
     },
     {
         "symbol": "EA.BK",
         "sector": "Utilities",
-        "pe": 1.2347826,
+        "pe": 1.2173913,
         "roe": -0.25104,
-        "pbv": 0.54996127,
+        "pbv": 0.54221535,
         "yield": null,
-        "price": 2.84,
+        "price": 2.8,
         "de": 125.565,
         "fcf": 2042562304,
         "shares": 7426800800,
@@ -933,16 +933,16 @@
         "total_debt": 51096395776,
         "current_ratio": 2.078,
         "revenue_growth": -0.109,
-        "timestamp": "2025-12-25T10:30:44.069835"
+        "timestamp": "2025-12-25T16:02:09.304186"
     },
     {
         "symbol": "EGCO.BK",
         "sector": "Utilities",
-        "pe": 12.222222,
+        "pe": 12.116403,
         "roe": 0.04855,
-        "pbv": 0.5987124,
-        "yield": 0.05627705627705628,
-        "price": 115.5,
+        "pbv": 0.59352875,
+        "yield": 0.056768558951965066,
+        "price": 114.5,
         "de": 108.537,
         "fcf": 2820576000,
         "shares": 526465000,
@@ -959,16 +959,16 @@
         "total_debt": 110503002112,
         "current_ratio": 2.761,
         "revenue_growth": -0.499,
-        "timestamp": "2025-12-25T10:30:44.511160"
+        "timestamp": "2025-12-25T16:02:09.719630"
     },
     {
         "symbol": "ERW.BK",
         "sector": "Consumer Cyclical",
-        "pe": 14.470589,
+        "pe": 14.3529415,
         "roe": 0.102390006,
-        "pbv": 1.3843557,
-        "yield": 0.036585365853658534,
-        "price": 2.46,
+        "pbv": 1.3731008,
+        "yield": 0.036885245901639344,
+        "price": 2.44,
         "de": 149.722,
         "fcf": 576369856,
         "shares": 4886929429,
@@ -985,16 +985,16 @@
         "total_debt": 14195308544,
         "current_ratio": 0.58,
         "revenue_growth": -0.036,
-        "timestamp": "2025-12-25T10:30:44.986266"
+        "timestamp": "2025-12-25T16:02:10.208786"
     },
     {
         "symbol": "GLOBAL.BK",
         "sector": "Consumer Cyclical",
-        "pe": 16.973684,
+        "pe": 16.710526,
         "roe": 0.082049996,
-        "pbv": 1.3850118,
-        "yield": 0.028569612403100773,
-        "price": 6.45,
+        "pbv": 1.3635387,
+        "yield": 0.029019527559055118,
+        "price": 6.35,
         "de": 48.88,
         "fcf": -530536640,
         "shares": 5401925388,
@@ -1011,7 +1011,7 @@
         "total_debt": 12427816960,
         "current_ratio": 1.222,
         "revenue_growth": 0.033,
-        "timestamp": "2025-12-25T10:30:45.536645"
+        "timestamp": "2025-12-25T16:02:10.757538"
     },
     {
         "symbol": "GPSC.BK",
@@ -1037,16 +1037,16 @@
         "total_debt": 116537106432,
         "current_ratio": 2.235,
         "revenue_growth": 0.019,
-        "timestamp": "2025-12-25T10:30:45.978507"
+        "timestamp": "2025-12-25T16:02:11.499932"
     },
     {
         "symbol": "GULF.BK",
         "sector": "Utilities",
-        "pe": 25.0,
+        "pe": 24.8538,
         "roe": 0.31365,
-        "pbv": 1.9726825,
+        "pbv": 1.9611462,
         "yield": 0.015,
-        "price": 42.75,
+        "price": 42.5,
         "de": 102.909,
         "fcf": -27782164480,
         "shares": 14939837683,
@@ -1063,16 +1063,16 @@
         "total_debt": 364514082816,
         "current_ratio": 0.893,
         "revenue_growth": -0.046,
-        "timestamp": "2025-12-25T10:30:46.384826"
+        "timestamp": "2025-12-25T16:02:11.894637"
     },
     {
         "symbol": "GUNKUL.BK",
         "sector": "Utilities",
-        "pe": 9.238096,
+        "pe": 9.190476,
         "roe": 0.13205,
-        "pbv": 1.1743342,
-        "yield": 0.061855670103092786,
-        "price": 1.94,
+        "pbv": 1.1682808,
+        "yield": 0.06217616580310881,
+        "price": 1.93,
         "de": 98.134,
         "fcf": 368401984,
         "shares": 8601610974,
@@ -1089,16 +1089,16 @@
         "total_debt": 13946408960,
         "current_ratio": 1.017,
         "revenue_growth": -0.122,
-        "timestamp": "2025-12-25T10:30:46.717339"
+        "timestamp": "2025-12-25T16:02:12.236939"
     },
     {
         "symbol": "HANA.BK",
         "sector": "Technology",
-        "pe": 14.759889,
+        "pe": 14.408463,
         "roe": -0.04284,
-        "pbv": 0.55387044,
-        "yield": 0.044642857142857144,
-        "price": 16.8,
+        "pbv": 0.5406831,
+        "yield": 0.04573170731707318,
+        "price": 16.4,
         "de": 0.077,
         "fcf": 3433523712,
         "shares": 885366660,
@@ -1115,16 +1115,16 @@
         "total_debt": 20569000,
         "current_ratio": 6.073,
         "revenue_growth": -0.173,
-        "timestamp": "2025-12-25T10:30:47.136783"
+        "timestamp": "2025-12-25T16:02:12.662060"
     },
     {
         "symbol": "HMPRO.BK",
         "sector": "Consumer Cyclical",
-        "pe": 14.148936,
+        "pe": 13.936171,
         "roe": 0.24757999,
-        "pbv": 3.522246,
-        "yield": 0.061654135338345864,
-        "price": 6.65,
+        "pbv": 3.4692798,
+        "yield": 0.06259541984732825,
+        "price": 6.55,
         "de": 100.45,
         "fcf": 4540358656,
         "shares": 12970998025,
@@ -1141,7 +1141,7 @@
         "total_debt": 24603789312,
         "current_ratio": 0.727,
         "revenue_growth": -0.017,
-        "timestamp": "2025-12-25T10:30:47.659924"
+        "timestamp": "2025-12-25T16:02:13.231690"
     },
     {
         "symbol": "ICHI.BK",
@@ -1167,16 +1167,16 @@
         "total_debt": 86373000,
         "current_ratio": 2.707,
         "revenue_growth": -0.002,
-        "timestamp": "2025-12-25T10:30:48.162064"
+        "timestamp": "2025-12-25T16:02:13.744228"
     },
     {
         "symbol": "IRPC.BK",
         "sector": "Energy",
-        "pe": -83.46972,
+        "pe": -81.83306,
         "roe": -0.060650002,
-        "pbv": 0.31183124,
-        "yield": 0.00980392156862745,
-        "price": 1.02,
+        "pbv": 0.3057169,
+        "yield": 0.01,
+        "price": 1.0,
         "de": 103.935,
         "fcf": 19846162432,
         "shares": 20410590846,
@@ -1193,16 +1193,16 @@
         "total_debt": 69500600320,
         "current_ratio": 1.164,
         "revenue_growth": -0.117,
-        "timestamp": "2025-12-25T10:30:48.559247"
+        "timestamp": "2025-12-25T16:02:14.137867"
     },
     {
         "symbol": "ITC.BK",
         "sector": "Consumer Defensive",
-        "pe": 16.262627,
+        "pe": 16.161615,
         "roe": 0.12731,
-        "pbv": 2.0982668,
-        "yield": 0.07142857142857141,
-        "price": 16.1,
+        "pbv": 2.085234,
+        "yield": 0.071875,
+        "price": 16.0,
         "de": 0.251,
         "fcf": 1080266752,
         "shares": 3000000000,
@@ -1219,16 +1219,16 @@
         "total_debt": 57738000,
         "current_ratio": 8.834,
         "revenue_growth": 0.064,
-        "timestamp": "2025-12-25T10:30:49.047282"
+        "timestamp": "2025-12-25T16:02:14.611892"
     },
     {
         "symbol": "IVL.BK",
         "sector": "Basic Materials",
-        "pe": 15.517289,
+        "pe": 15.235157,
         "roe": -0.00826,
-        "pbv": 0.8165892,
-        "yield": 0.04242424242424242,
-        "price": 16.5,
+        "pbv": 0.80174214,
+        "yield": 0.043209876543209874,
+        "price": 16.2,
         "de": 196.67,
         "fcf": 1801528192,
         "shares": 5614552000,
@@ -1245,16 +1245,16 @@
         "total_debt": 275158138880,
         "current_ratio": 1.057,
         "revenue_growth": -0.196,
-        "timestamp": "2025-12-25T10:30:49.394106"
+        "timestamp": "2025-12-25T16:02:14.969752"
     },
     {
         "symbol": "JAS.BK",
         "sector": "Communication Services",
-        "pe": 5.64,
+        "pe": 5.52,
         "roe": 0.19415002,
-        "pbv": 1.1163895,
+        "pbv": 1.0926366,
         "yield": null,
-        "price": 1.41,
+        "price": 1.38,
         "de": 20.807,
         "fcf": -6054085120,
         "shares": 8292074705,
@@ -1271,16 +1271,16 @@
         "total_debt": 2425582080,
         "current_ratio": 1.258,
         "revenue_growth": 0.28,
-        "timestamp": "2025-12-25T10:30:49.828975"
+        "timestamp": "2025-12-25T16:02:15.385356"
     },
     {
         "symbol": "JMART.BK",
         "sector": "Consumer Cyclical",
-        "pe": 16.25,
+        "pe": 15.795454,
         "roe": 0.03458,
-        "pbv": 0.55499494,
-        "yield": 0.050349650349650346,
-        "price": 7.15,
+        "pbv": 0.5394706,
+        "yield": 0.051798561151079135,
+        "price": 6.95,
         "de": 78.817,
         "fcf": -368802848,
         "shares": 1463971640,
@@ -1297,16 +1297,16 @@
         "total_debt": 26501914624,
         "current_ratio": 0.977,
         "revenue_growth": 0.13,
-        "timestamp": "2025-12-25T10:30:50.317266"
+        "timestamp": "2025-12-25T16:02:15.854960"
     },
     {
         "symbol": "JMT.BK",
         "sector": "Financial Services",
-        "pe": 10.963856,
+        "pe": 10.60241,
         "roe": 0.044060003,
-        "pbv": 0.49330515,
-        "yield": 0.05714285714285715,
-        "price": 9.1,
+        "pbv": 0.47704235,
+        "yield": 0.05909090909090909,
+        "price": 8.8,
         "de": 46.533,
         "fcf": -95155848,
         "shares": 1459739581,
@@ -1323,16 +1323,16 @@
         "total_debt": 12888571904,
         "current_ratio": 1.342,
         "revenue_growth": -0.128,
-        "timestamp": "2025-12-25T10:30:50.747040"
+        "timestamp": "2025-12-25T16:02:16.279816"
     },
     {
         "symbol": "JTS.BK",
         "sector": "Communication Services",
-        "pe": 170.94594,
+        "pe": 152.7027,
         "roe": 0.23486,
-        "pbv": 36.350574,
+        "pbv": 32.471264,
         "yield": null,
-        "price": 63.25,
+        "price": 56.5,
         "de": 74.449,
         "fcf": 520724032,
         "shares": 706457300,
@@ -1349,16 +1349,16 @@
         "total_debt": 911820992,
         "current_ratio": 0.75,
         "revenue_growth": -0.155,
-        "timestamp": "2025-12-25T10:30:51.180316"
+        "timestamp": "2025-12-25T16:02:16.711634"
     },
     {
         "symbol": "KBANK.BK",
         "sector": "Financial Services",
-        "pe": 9.431651,
+        "pe": 9.456149,
         "roe": 0.08174,
-        "pbv": 0.7995581,
-        "yield": 0.06493506493506493,
-        "price": 192.5,
+        "pbv": 0.80163485,
+        "yield": 0.06476683937823834,
+        "price": 193.0,
         "de": 655.6598084406039,
         "fcf": null,
         "shares": 2369327593,
@@ -1375,16 +1375,16 @@
         "total_debt": 285851713536,
         "current_ratio": null,
         "revenue_growth": 0.046,
-        "timestamp": "2025-12-25T10:30:51.619116"
+        "timestamp": "2025-12-25T16:02:17.138399"
     },
     {
         "symbol": "KCE.BK",
         "sector": "Technology",
-        "pe": 24.698795,
+        "pe": 22.40964,
         "roe": 0.07636,
-        "pbv": 1.858736,
-        "yield": 0.058536585365853655,
-        "price": 20.5,
+        "pbv": 1.686463,
+        "yield": 0.06451612903225806,
+        "price": 18.6,
         "de": 11.027,
         "fcf": 1614756608,
         "shares": 1182088596,
@@ -1401,16 +1401,16 @@
         "total_debt": 1443501056,
         "current_ratio": 2.205,
         "revenue_growth": -0.094,
-        "timestamp": "2025-12-25T10:30:52.282265"
+        "timestamp": "2025-12-25T16:02:17.774621"
     },
     {
         "symbol": "KKP.BK",
         "sector": "Financial Services",
-        "pe": 9.755193,
+        "pe": 9.866469,
         "roe": 0.08886,
-        "pbv": 0.845333,
-        "yield": 0.06463878326996197,
-        "price": 65.75,
+        "pbv": 0.8549756,
+        "yield": 0.06390977443609022,
+        "price": 66.5,
         "de": 691.811975819215,
         "fcf": null,
         "shares": 815914480,
@@ -1427,16 +1427,16 @@
         "total_debt": 41806741504,
         "current_ratio": null,
         "revenue_growth": -0.017,
-        "timestamp": "2025-12-25T10:30:52.774558"
+        "timestamp": "2025-12-25T16:02:18.288134"
     },
     {
         "symbol": "KTB.BK",
         "sector": "Financial Services",
-        "pe": 8.560606,
+        "pe": 8.484849,
         "roe": 0.10742,
-        "pbv": 0.8557753,
-        "yield": 0.06991150442477875,
-        "price": 28.25,
+        "pbv": 0.84820205,
+        "yield": 0.07053571428571428,
+        "price": 28.0,
         "de": 738.9623559993868,
         "fcf": null,
         "shares": 13976061250,
@@ -1453,16 +1453,16 @@
         "total_debt": 201116549120,
         "current_ratio": null,
         "revenue_growth": 0.076,
-        "timestamp": "2025-12-25T10:30:53.431474"
+        "timestamp": "2025-12-25T16:02:18.984733"
     },
     {
         "symbol": "KTC.BK",
         "sector": "Financial Services",
-        "pe": 9.268707,
+        "pe": 9.0986395,
         "roe": 0.18673,
-        "pbv": 1.6682993,
-        "yield": 0.04844036697247707,
-        "price": 27.25,
+        "pbv": 1.6376883,
+        "yield": 0.049345794392523366,
+        "price": 26.75,
         "de": 132.216,
         "fcf": null,
         "shares": 2578334070,
@@ -1479,7 +1479,7 @@
         "total_debt": 55655428096,
         "current_ratio": 4.288,
         "revenue_growth": 0.045,
-        "timestamp": "2025-12-25T10:30:54.127535"
+        "timestamp": "2025-12-25T16:02:19.655510"
     },
     {
         "symbol": "LH.BK",
@@ -1505,16 +1505,16 @@
         "total_debt": 79756230656,
         "current_ratio": 1.928,
         "revenue_growth": -0.122,
-        "timestamp": "2025-12-25T10:30:54.591896"
+        "timestamp": "2025-12-25T16:02:20.106467"
     },
     {
         "symbol": "M.BK",
         "sector": "Consumer Cyclical",
-        "pe": 15.916666,
+        "pe": 15.583333,
         "roe": 0.08184,
-        "pbv": 1.3474427,
-        "yield": 0.07853403141361257,
-        "price": 19.1,
+        "pbv": 1.319224,
+        "yield": 0.08021390374331551,
+        "price": 18.7,
         "de": 19.439,
         "fcf": 2011926016,
         "shares": 903628100,
@@ -1531,16 +1531,16 @@
         "total_debt": 2562103040,
         "current_ratio": 2.73,
         "revenue_growth": 0.046,
-        "timestamp": "2025-12-25T10:30:55.087305"
+        "timestamp": "2025-12-25T16:02:20.601376"
     },
     {
         "symbol": "MBK.BK",
         "sector": "Industrials",
-        "pe": 7.352941,
+        "pe": 7.394958,
         "roe": 0.15131,
-        "pbv": 1.1037527,
-        "yield": 0.05714285714285714,
-        "price": 17.5,
+        "pbv": 1.11006,
+        "yield": 0.056818181818181816,
+        "price": 17.6,
         "de": 117.864,
         "fcf": 3818516736,
         "shares": 1397598626,
@@ -1557,16 +1557,16 @@
         "total_debt": 32217774080,
         "current_ratio": 0.91,
         "revenue_growth": 0.08,
-        "timestamp": "2025-12-25T10:30:55.486421"
+        "timestamp": "2025-12-25T16:02:21.007307"
     },
     {
         "symbol": "MEGA.BK",
         "sector": "Healthcare",
-        "pe": 14.427313,
+        "pe": 14.317181,
         "roe": 0.20868999,
-        "pbv": 2.9488566,
-        "yield": 0.04885496183206107,
-        "price": 32.75,
+        "pbv": 2.926346,
+        "yield": 0.04923076923076923,
+        "price": 32.5,
         "de": 6.372,
         "fcf": 2043483648,
         "shares": 871869508,
@@ -1583,16 +1583,16 @@
         "total_debt": 617011968,
         "current_ratio": 2.3,
         "revenue_growth": -0.03,
-        "timestamp": "2025-12-25T10:30:55.969317"
+        "timestamp": "2025-12-25T16:02:21.514447"
     },
     {
         "symbol": "MINT.BK",
         "sector": "Consumer Cyclical",
-        "pe": 17.375887,
+        "pe": 17.304964,
         "roe": 0.11417,
-        "pbv": 2.5061374,
-        "yield": 0.026530612244897955,
-        "price": 24.5,
+        "pbv": 2.4959083,
+        "yield": 0.02663934426229508,
+        "price": 24.4,
         "de": 194.548,
         "fcf": 27495557120,
         "shares": 5669976977,
@@ -1609,16 +1609,16 @@
         "total_debt": 184496488448,
         "current_ratio": 0.615,
         "revenue_growth": -0.011,
-        "timestamp": "2025-12-25T10:30:56.366358"
+        "timestamp": "2025-12-25T16:02:21.914113"
     },
     {
         "symbol": "MOSHI.BK",
         "sector": "Consumer Cyclical",
-        "pe": 16.839378,
+        "pe": 16.968912,
         "roe": 0.27543,
-        "pbv": 4.315496,
-        "yield": 0.024615384615384615,
-        "price": 32.5,
+        "pbv": 4.348692,
+        "yield": 0.024427480916030534,
+        "price": 32.75,
         "de": 66.65,
         "fcf": 606466304,
         "shares": 329999954,
@@ -1635,16 +1635,16 @@
         "total_debt": 1656371328,
         "current_ratio": 2.83,
         "revenue_growth": 0.148,
-        "timestamp": "2025-12-25T10:30:56.861359"
+        "timestamp": "2025-12-25T16:02:22.388643"
     },
     {
         "symbol": "MTC.BK",
         "sector": "Financial Services",
-        "pe": 10.866014,
+        "pe": 10.702615,
         "roe": 0.16864,
-        "pbv": 1.7093358,
-        "yield": 0.007518796992481203,
-        "price": 33.25,
+        "pbv": 1.6836315,
+        "yield": 0.007633587786259542,
+        "price": 32.75,
         "de": 354.563,
         "fcf": null,
         "shares": 2120000000,
@@ -1661,7 +1661,7 @@
         "total_debt": 146218614784,
         "current_ratio": 3.538,
         "revenue_growth": 0.094,
-        "timestamp": "2025-12-25T10:30:57.220089"
+        "timestamp": "2025-12-25T16:02:22.745737"
     },
     {
         "symbol": "OR.BK",
@@ -1687,16 +1687,16 @@
         "total_debt": 22990559232,
         "current_ratio": 2.118,
         "revenue_growth": -0.128,
-        "timestamp": "2025-12-25T10:30:57.608416"
+        "timestamp": "2025-12-25T16:02:23.127294"
     },
     {
         "symbol": "OSP.BK",
         "sector": "Consumer Defensive",
-        "pe": 13.81356,
+        "pe": 13.389832,
         "roe": 0.23524,
-        "pbv": 3.021876,
-        "yield": 0.042944785276073615,
-        "price": 16.3,
+        "pbv": 2.9291806,
+        "yield": 0.044303797468354424,
+        "price": 15.8,
         "de": 8.504,
         "fcf": 4579823616,
         "shares": 3003750000,
@@ -1713,16 +1713,16 @@
         "total_debt": 1414630016,
         "current_ratio": 1.667,
         "revenue_growth": -0.073,
-        "timestamp": "2025-12-25T10:30:57.969240"
+        "timestamp": "2025-12-25T16:02:23.494103"
     },
     {
         "symbol": "PLANB.BK",
         "sector": "Communication Services",
-        "pe": 17.083334,
+        "pe": 16.75,
         "roe": 0.11003,
-        "pbv": 1.5298507,
-        "yield": 0.04082926829268293,
-        "price": 4.1,
+        "pbv": 1.5,
+        "yield": 0.041641791044776125,
+        "price": 4.02,
         "de": 36.57,
         "fcf": 2878224896,
         "shares": 4600279515,
@@ -1739,16 +1739,16 @@
         "total_debt": 4705712128,
         "current_ratio": 1.374,
         "revenue_growth": -0.09,
-        "timestamp": "2025-12-25T10:30:58.352239"
+        "timestamp": "2025-12-25T16:02:23.859764"
     },
     {
         "symbol": "PR9.BK",
         "sector": "Healthcare",
-        "pe": 18.269232,
+        "pe": 18.173077,
         "roe": 0.14551,
-        "pbv": 2.5689561,
-        "yield": 0.02368421052631579,
-        "price": 19.0,
+        "pbv": 2.5554354,
+        "yield": 0.02380952380952381,
+        "price": 18.9,
         "de": 0.278,
         "fcf": 497059488,
         "shares": 786300000,
@@ -1765,7 +1765,7 @@
         "total_debt": 16164000,
         "current_ratio": 3.858,
         "revenue_growth": 0.12,
-        "timestamp": "2025-12-25T10:30:58.738532"
+        "timestamp": "2025-12-25T16:02:24.258619"
     },
     {
         "symbol": "PRM.BK",
@@ -1791,7 +1791,7 @@
         "total_debt": 9855119360,
         "current_ratio": 1.184,
         "revenue_growth": 0.07,
-        "timestamp": "2025-12-25T10:30:59.118179"
+        "timestamp": "2025-12-25T16:02:24.645288"
     },
     {
         "symbol": "PTT.BK",
@@ -1817,16 +1817,16 @@
         "total_debt": 1012658405376,
         "current_ratio": 1.653,
         "revenue_growth": -0.151,
-        "timestamp": "2025-12-25T10:30:59.511464"
+        "timestamp": "2025-12-25T16:02:25.039512"
     },
     {
         "symbol": "PTTEP.BK",
         "sector": "Energy",
-        "pe": 7.249675,
+        "pe": 7.217165,
         "roe": 0.11739001,
-        "pbv": 0.89230555,
-        "yield": 0.0827354260089686,
-        "price": 111.5,
+        "pbv": 0.8883042,
+        "yield": 0.0831081081081081,
+        "price": 111.0,
         "de": 24.937,
         "fcf": 950975744,
         "shares": 3969985400,
@@ -1843,16 +1843,16 @@
         "total_debt": 3975757056,
         "current_ratio": 1.679,
         "revenue_growth": -0.022,
-        "timestamp": "2025-12-25T10:30:59.993959"
+        "timestamp": "2025-12-25T16:02:25.516589"
     },
     {
         "symbol": "PTTGC.BK",
         "sector": "Basic Materials",
-        "pe": 27.496418,
+        "pe": 27.240637,
         "roe": -0.07501,
-        "pbv": 0.33278126,
-        "yield": 0.023255813953488372,
-        "price": 21.5,
+        "pbv": 0.32968563,
+        "yield": 0.023474178403755867,
+        "price": 21.3,
         "de": 61.419,
         "fcf": 53795508224,
         "shares": 4508849117,
@@ -1869,16 +1869,16 @@
         "total_debt": 182772170752,
         "current_ratio": 1.08,
         "revenue_growth": -0.153,
-        "timestamp": "2025-12-25T10:31:00.485188"
+        "timestamp": "2025-12-25T16:02:26.045415"
     },
     {
         "symbol": "QH.BK",
         "sector": "Real Estate",
-        "pe": 9.066667,
+        "pe": 9.0,
         "roe": 0.05722,
-        "pbv": 0.48640916,
-        "yield": 0.07352941176470588,
-        "price": 1.36,
+        "pbv": 0.48283264,
+        "yield": 0.07407407407407407,
+        "price": 1.35,
         "de": 37.837,
         "fcf": 1166860160,
         "shares": 10714281645,
@@ -1895,7 +1895,7 @@
         "total_debt": 11334915072,
         "current_ratio": 3.657,
         "revenue_growth": -0.018,
-        "timestamp": "2025-12-25T10:31:00.908736"
+        "timestamp": "2025-12-25T16:02:26.442034"
     },
     {
         "symbol": "RATCH.BK",
@@ -1921,7 +1921,7 @@
         "total_debt": 94506721280,
         "current_ratio": 0.967,
         "revenue_growth": -0.415,
-        "timestamp": "2025-12-25T10:31:01.399970"
+        "timestamp": "2025-12-25T16:02:26.953174"
     },
     {
         "symbol": "RCL.BK",
@@ -1947,16 +1947,16 @@
         "total_debt": 16753179648,
         "current_ratio": 2.605,
         "revenue_growth": -0.147,
-        "timestamp": "2025-12-25T10:31:01.870651"
+        "timestamp": "2025-12-25T16:02:27.467768"
     },
     {
         "symbol": "SAWAD.BK",
         "sector": "Financial Services",
-        "pe": 9.121621,
+        "pe": 9.037162,
         "roe": 0.13828,
-        "pbv": 1.2408658,
-        "yield": 0.014444444444444442,
-        "price": 27.0,
+        "pbv": 1.2293763,
+        "yield": 0.014579439252336446,
+        "price": 26.75,
         "de": 156.86,
         "fcf": null,
         "shares": 1661506929,
@@ -1973,16 +1973,16 @@
         "total_debt": 61777043456,
         "current_ratio": 3.219,
         "revenue_growth": -0.068,
-        "timestamp": "2025-12-25T10:31:02.369438"
+        "timestamp": "2025-12-25T16:02:27.960865"
     },
     {
         "symbol": "SCB.BK",
         "sector": "Financial Services",
-        "pe": 9.375,
+        "pe": 9.443681,
         "roe": 0.102390006,
-        "pbv": 0.94538254,
-        "yield": 0.07648351648351648,
-        "price": 136.5,
+        "pbv": 0.95230836,
+        "yield": 0.07592727272727272,
+        "price": 137.5,
         "de": 618.0,
         "fcf": null,
         "shares": 3367107286,
@@ -1999,16 +1999,16 @@
         "total_debt": 161317404672,
         "current_ratio": null,
         "revenue_growth": 0.049,
-        "timestamp": "2025-12-25T10:31:02.803732"
+        "timestamp": "2025-12-25T16:02:28.364171"
     },
     {
         "symbol": "SCC.BK",
         "sector": "Industrials",
-        "pe": 13.212795,
+        "pe": 13.108484,
         "roe": 0.03455,
-        "pbv": 0.6494039,
-        "yield": 0.02631578947368421,
-        "price": 190.0,
+        "pbv": 0.6442771,
+        "yield": 0.026525198938992044,
+        "price": 188.5,
         "de": 80.351,
         "fcf": 9879514112,
         "shares": 1200000000,
@@ -2025,16 +2025,16 @@
         "total_debt": 330316742656,
         "current_ratio": 1.009,
         "revenue_growth": -0.05,
-        "timestamp": "2025-12-25T10:31:03.321973"
+        "timestamp": "2025-12-25T16:02:28.856409"
     },
     {
         "symbol": "SCGP.BK",
         "sector": "Consumer Cyclical",
-        "pe": 26.212118,
+        "pe": 25.757574,
         "roe": 0.03441,
-        "pbv": 0.99419576,
-        "yield": 0.031791907514450865,
-        "price": 17.3,
+        "pbv": 0.9769554,
+        "yield": 0.03235294117647059,
+        "price": 17.0,
         "de": 70.675,
         "fcf": 6117072896,
         "shares": 4292920000,
@@ -2051,16 +2051,16 @@
         "total_debt": 63845920768,
         "current_ratio": 1.213,
         "revenue_growth": -0.088,
-        "timestamp": "2025-12-25T10:31:03.824150"
+        "timestamp": "2025-12-25T16:02:29.351981"
     },
     {
         "symbol": "SIRI.BK",
         "sector": "Real Estate",
-        "pe": 6.136364,
+        "pe": 6.1818185,
         "roe": 0.07975,
-        "pbv": 0.54304105,
+        "pbv": 0.5470635,
         "yield": 0.1112,
-        "price": 1.35,
+        "price": 1.36,
         "de": 144.285,
         "fcf": 19978379264,
         "shares": 17436621291,
@@ -2077,16 +2077,16 @@
         "total_debt": 73462906880,
         "current_ratio": 1.782,
         "revenue_growth": -0.157,
-        "timestamp": "2025-12-25T10:31:04.186182"
+        "timestamp": "2025-12-25T16:02:29.738108"
     },
     {
         "symbol": "SISB.BK",
         "sector": "Consumer Defensive",
-        "pe": 10.857143,
+        "pe": 10.761906,
         "roe": 0.28693,
-        "pbv": 2.8766084,
-        "yield": 0.03684210526315789,
-        "price": 11.4,
+        "pbv": 2.8513753,
+        "yield": 0.03716814159292035,
+        "price": 11.3,
         "de": 15.422,
         "fcf": 478446944,
         "shares": 940000000,
@@ -2103,16 +2103,16 @@
         "total_debt": 574628992,
         "current_ratio": 1.677,
         "revenue_growth": 0.094,
-        "timestamp": "2025-12-25T10:31:04.699532"
+        "timestamp": "2025-12-25T16:02:30.242511"
     },
     {
         "symbol": "SJWD.BK",
         "sector": "Industrials",
-        "pe": 11.75,
+        "pe": 11.833333,
         "roe": 0.05125,
-        "pbv": 0.55324495,
-        "yield": 0.05390070921985816,
-        "price": 7.05,
+        "pbv": 0.55716866,
+        "yield": 0.053521126760563385,
+        "price": 7.1,
         "de": 67.009,
         "fcf": 1171282944,
         "shares": 1776525806,
@@ -2129,16 +2129,16 @@
         "total_debt": 15922657280,
         "current_ratio": 0.619,
         "revenue_growth": -0.007,
-        "timestamp": "2025-12-25T10:31:05.090415"
+        "timestamp": "2025-12-25T16:02:30.627400"
     },
     {
         "symbol": "SPALI.BK",
         "sector": "Real Estate",
-        "pe": 7.1784225,
+        "pe": 7.1369295,
         "roe": 0.088690005,
-        "pbv": 0.6216536,
-        "yield": 0.08092485549132947,
-        "price": 17.3,
+        "pbv": 0.6180603,
+        "yield": 0.0813953488372093,
+        "price": 17.2,
         "de": 70.738,
         "fcf": 1504175872,
         "shares": 1888242530,
@@ -2155,16 +2155,16 @@
         "total_debt": 37925912576,
         "current_ratio": 2.444,
         "revenue_growth": -0.352,
-        "timestamp": "2025-12-25T10:31:05.487996"
+        "timestamp": "2025-12-25T16:02:31.050913"
     },
     {
         "symbol": "SPRC.BK",
         "sector": "Energy",
-        "pe": 15.657894,
+        "pe": 15.526317,
         "roe": 0.04384,
-        "pbv": 0.68651205,
-        "yield": 0.050420168067226885,
-        "price": 5.95,
+        "pbv": 0.6807431,
+        "yield": 0.05084745762711864,
+        "price": 5.9,
         "de": 24.368,
         "fcf": 4062094592,
         "shares": 4335902125,
@@ -2181,7 +2181,7 @@
         "total_debt": 9158928384,
         "current_ratio": 1.868,
         "revenue_growth": -0.049,
-        "timestamp": "2025-12-25T10:31:05.971237"
+        "timestamp": "2025-12-25T16:02:31.559425"
     },
     {
         "symbol": "STA.BK",
@@ -2207,16 +2207,16 @@
         "total_debt": 35807358976,
         "current_ratio": 2.385,
         "revenue_growth": -0.318,
-        "timestamp": "2025-12-25T10:31:06.363642"
+        "timestamp": "2025-12-25T16:02:31.962644"
     },
     {
         "symbol": "STGT.BK",
         "sector": "Basic Materials",
-        "pe": 26.764708,
+        "pe": 26.617647,
         "roe": 0.02547,
-        "pbv": 0.68149483,
-        "yield": 0.054945054945054944,
-        "price": 9.1,
+        "pbv": 0.67775035,
+        "yield": 0.055248618784530384,
+        "price": 9.05,
         "de": 13.07,
         "fcf": 1945743616,
         "shares": 2840179910,
@@ -2233,16 +2233,16 @@
         "total_debt": 4973494784,
         "current_ratio": 2.405,
         "revenue_growth": -0.056,
-        "timestamp": "2025-12-25T10:31:06.867490"
+        "timestamp": "2025-12-25T16:02:32.438246"
     },
     {
         "symbol": "TASCO.BK",
         "sector": "Basic Materials",
-        "pe": 13.725491,
+        "pe": 13.82353,
         "roe": 0.10268,
-        "pbv": 1.4693536,
-        "yield": 0.12142857142857144,
-        "price": 14.0,
+        "pbv": 1.479849,
+        "yield": 0.12056737588652484,
+        "price": 14.1,
         "de": 25.984,
         "fcf": 793793280,
         "shares": 1578361570,
@@ -2259,16 +2259,16 @@
         "total_debt": 3960997888,
         "current_ratio": 1.984,
         "revenue_growth": -0.284,
-        "timestamp": "2025-12-25T10:31:07.245943"
+        "timestamp": "2025-12-25T16:02:32.797554"
     },
     {
         "symbol": "TCAP.BK",
         "sector": "Financial Services",
-        "pe": 8.226496,
+        "pe": 8.190884,
         "roe": 0.096269995,
-        "pbv": 0.76852447,
-        "yield": 0.058008658008658,
-        "price": 57.75,
+        "pbv": 0.7651975,
+        "yield": 0.05826086956521739,
+        "price": 57.5,
         "de": 117.26308955522249,
         "fcf": null,
         "shares": 1048604897,
@@ -2285,7 +2285,7 @@
         "total_debt": 53574488064,
         "current_ratio": null,
         "revenue_growth": 0.34,
-        "timestamp": "2025-12-25T10:31:07.748873"
+        "timestamp": "2025-12-25T16:02:33.290731"
     },
     {
         "symbol": "TFG.BK",
@@ -2311,7 +2311,7 @@
         "total_debt": 18542288896,
         "current_ratio": 1.132,
         "revenue_growth": 0.074,
-        "timestamp": "2025-12-25T10:31:08.422691"
+        "timestamp": "2025-12-25T16:02:33.942246"
     },
     {
         "symbol": "TIDLOR.BK",
@@ -2337,16 +2337,16 @@
         "total_debt": 72384217088,
         "current_ratio": 3.046,
         "revenue_growth": 0.059,
-        "timestamp": "2025-12-25T10:31:08.830269"
+        "timestamp": "2025-12-25T16:02:34.330800"
     },
     {
         "symbol": "TISCO.BK",
         "sector": "Financial Services",
-        "pe": 13.095239,
+        "pe": 12.9761915,
         "roe": 0.16146,
-        "pbv": 2.109098,
-        "yield": 0.07045454545454545,
-        "price": 110.0,
+        "pbv": 2.0899243,
+        "yield": 0.07110091743119266,
+        "price": 109.0,
         "de": 554.8820226409379,
         "fcf": null,
         "shares": 800645624,
@@ -2363,7 +2363,7 @@
         "total_debt": 20388595712,
         "current_ratio": null,
         "revenue_growth": 0.003,
-        "timestamp": "2025-12-25T10:31:09.164967"
+        "timestamp": "2025-12-25T16:02:34.671235"
     },
     {
         "symbol": "TLI.BK",
@@ -2389,16 +2389,16 @@
         "total_debt": 0,
         "current_ratio": 1.475,
         "revenue_growth": 0.001,
-        "timestamp": "2025-12-25T10:31:09.820768"
+        "timestamp": "2025-12-25T16:02:35.290559"
     },
     {
         "symbol": "TOA.BK",
         "sector": "Basic Materials",
-        "pe": 10.4651165,
+        "pe": 10.387597,
         "roe": 0.17978,
-        "pbv": 1.9086667,
-        "yield": 0.04666666666666667,
-        "price": 13.5,
+        "pbv": 1.8945284,
+        "yield": 0.04701492537313433,
+        "price": 13.4,
         "de": 8.963,
         "fcf": 2322873600,
         "shares": 1938584500,
@@ -2415,7 +2415,7 @@
         "total_debt": 1290291968,
         "current_ratio": 2.965,
         "revenue_growth": 0.038,
-        "timestamp": "2025-12-25T10:31:10.354512"
+        "timestamp": "2025-12-25T16:02:35.850690"
     },
     {
         "symbol": "TOP.BK",
@@ -2441,16 +2441,16 @@
         "total_debt": 137840754688,
         "current_ratio": 1.332,
         "revenue_growth": -0.28,
-        "timestamp": "2025-12-25T10:31:10.746572"
+        "timestamp": "2025-12-25T16:02:36.240531"
     },
     {
         "symbol": "TRUE.BK",
         "sector": "Communication Services",
-        "pe": 18.027504,
+        "pe": 17.708433,
         "roe": -0.02856,
-        "pbv": 4.988962,
-        "yield": 0.016814159292035398,
-        "price": 11.3,
+        "pbv": 4.9006624,
+        "yield": 0.01711711711711712,
+        "price": 11.1,
         "de": 571.77,
         "fcf": 9761559552,
         "shares": 34552100801,
@@ -2467,16 +2467,16 @@
         "total_debt": 446194089984,
         "current_ratio": 0.483,
         "revenue_growth": -0.071,
-        "timestamp": "2025-12-25T10:31:11.184556"
+        "timestamp": "2025-12-25T16:02:36.726835"
     },
     {
         "symbol": "TTB.BK",
         "sector": "Financial Services",
-        "pe": 9.272727,
+        "pe": 9.181818,
         "roe": 0.08583,
-        "pbv": 0.8018868,
-        "yield": 0.06421568627450981,
-        "price": 2.04,
+        "pbv": 0.7940252,
+        "yield": 0.06485148514851485,
+        "price": 2.02,
         "de": 635.252973618483,
         "fcf": null,
         "shares": 94883155679,
@@ -2493,16 +2493,16 @@
         "total_debt": 33833973760,
         "current_ratio": null,
         "revenue_growth": -0.011,
-        "timestamp": "2025-12-25T10:31:11.647149"
+        "timestamp": "2025-12-25T16:02:37.203092"
     },
     {
         "symbol": "TU.BK",
         "sector": "Consumer Defensive",
-        "pe": 10.940171,
+        "pe": 10.854701,
         "roe": 0.10172,
-        "pbv": 1.1088972,
-        "yield": 0.05468749999999999,
-        "price": 12.8,
+        "pbv": 1.1002339,
+        "yield": 0.05511811023622047,
+        "price": 12.7,
         "de": 143.573,
         "fcf": 6118162432,
         "shares": 3855093796,
@@ -2519,16 +2519,16 @@
         "total_debt": 74074071040,
         "current_ratio": 1.736,
         "revenue_growth": -0.01,
-        "timestamp": "2025-12-25T10:31:12.303263"
+        "timestamp": "2025-12-25T16:02:37.910765"
     },
     {
         "symbol": "VGI.BK",
         "sector": "Industrials",
-        "pe": 49.000004,
+        "pe": 48.500004,
         "roe": 0.009380001,
-        "pbv": 0.5677868,
-        "yield": 0.013265306122448979,
-        "price": 0.98,
+        "pbv": 0.56199306,
+        "yield": 0.013402061855670102,
+        "price": 0.97,
         "de": 2.233,
         "fcf": 3025719,
         "shares": 21101284893,
@@ -2545,7 +2545,7 @@
         "total_debt": 854329984,
         "current_ratio": 9.656,
         "revenue_growth": -0.162,
-        "timestamp": "2025-12-25T10:31:12.799586"
+        "timestamp": "2025-12-25T16:02:38.397192"
     },
     {
         "symbol": "WHA.BK",
@@ -2571,16 +2571,16 @@
         "total_debt": 48798638080,
         "current_ratio": 1.473,
         "revenue_growth": -0.147,
-        "timestamp": "2025-12-25T10:31:13.207320"
+        "timestamp": "2025-12-25T16:02:38.823971"
     },
     {
         "symbol": "WHAUP.BK",
         "sector": "Utilities",
-        "pe": 15.928572,
+        "pe": 15.857143,
         "roe": 0.08,
-        "pbv": 1.2605991,
-        "yield": 0.05661434977578476,
-        "price": 4.46,
+        "pbv": 1.2549462,
+        "yield": 0.056869369369369364,
+        "price": 4.44,
         "de": 123.229,
         "fcf": -1069638848,
         "shares": 3825000000,
@@ -2597,6 +2597,6 @@
         "total_debt": 16678577152,
         "current_ratio": 0.441,
         "revenue_growth": 0.242,
-        "timestamp": "2025-12-25T10:31:13.622535"
+        "timestamp": "2025-12-25T16:02:39.252129"
     }
 ]
