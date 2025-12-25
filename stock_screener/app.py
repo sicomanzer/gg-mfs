@@ -586,13 +586,40 @@ else:
         }
         ranked_df['sector_th'] = ranked_df['sector'].map(sector_map).fillna(ranked_df['sector']) # Use English if no map
 
+        # --- LOGIC: Auto-Rating ---
+        def get_rating(row):
+            # 1. Financial Strength (F-Score >= 7 is Strong)
+            fs = row['f_score'] if pd.notnull(row['f_score']) else 0
+            strong_fin = fs >= 7
+            weak_fin = fs <= 4
+            
+            # 2. Valuation (MOS > 0 is Undervalued)
+            mos = row['mos'] if pd.notnull(row['mos']) else -1
+            cheap = mos > 0
+            very_cheap = mos > 0.20
+            
+            # 3. Risk (High Debt > 2.5)
+            de_ratio = row['de'] if pd.notnull(row['de']) else 0
+            high_risk = de_ratio > 2.5
+            
+            if strong_fin and very_cheap and not high_risk:
+                return "⭐⭐⭐" # Top Pick
+            elif (strong_fin and cheap) or (fs >= 6 and very_cheap):
+                return "⭐⭐"     # Good
+            elif weak_fin or high_risk:
+                return "⚠️"      # Caution
+            else:
+                return "😐"      # Neutral
+
+        ranked_df['rating_icon'] = ranked_df.apply(get_rating, axis=1)
+
         display_df = ranked_df[[
-            'symbol', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
+            'symbol', 'rating_icon', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
         ]].reset_index(drop=True)
         
         display_df.index += 1 
         display_df.columns = [
-            'Symbol', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
+            'Symbol', 'Rating', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
         ]
     
         st.dataframe(
@@ -600,6 +627,7 @@ else:
             use_container_width=True,
             column_config={
                 "Symbol": st.column_config.TextColumn(width="small"),
+                "Rating": st.column_config.TextColumn(width="small", help="⭐⭐⭐ = Strong F-Score & Undervalued"),
                 "Industry": st.column_config.TextColumn(width="medium", help="กลุ่มอุตสาหกรรม (Sector)"),
                 "Magic Score": st.column_config.NumberColumn(
                     "Magic Score (Lower is Better)",
