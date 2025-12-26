@@ -77,7 +77,8 @@ streamlit run stock_screener/app.py
 
 ## 📸 ตัวอย่างหน้าจอ (Preview)
 
-*(แปะรูป Screenshot หน้าจอ Magic Quadrant สวยๆ ตรงนี้)*
+<img width="1530" height="807" alt="image" src="https://github.com/user-attachments/assets/85a2513f-5934-4202-b6d3-2402eac22a10" />
+
 
 ---
 
@@ -89,3 +90,4 @@ streamlit run stock_screener/app.py
 <p align="center">
   Development with ❤️ by <b>Antigravity</b> based on Magic Formula Investing
 </p>
+
