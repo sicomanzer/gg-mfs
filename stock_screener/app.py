@@ -607,13 +607,30 @@ else:
 
         ranked_df['rating_icon'] = ranked_df.apply(get_rating, axis=1)
 
+        # --- LOGIC: Quadrant Category ---
+        def get_quadrant(row):
+            pe = row['pe'] if pd.notnull(row['pe']) else 999
+            roe = row['roe'] if pd.notnull(row['roe']) else 0
+            
+            # Benchmarks: PE=15, ROE=12
+            if pe < 15 and roe >= 12:
+                return "💎 ของดีราคาถูก"
+            elif pe >= 15 and roe >= 12:
+                return "⭐ แพงแต่ดี"
+            elif pe < 15 and roe < 12:
+                return "⚠️ ระวังกับดัก"
+            else:
+                return "❌ แพงและแย่"
+
+        ranked_df['quadrant'] = ranked_df.apply(get_quadrant, axis=1)
+
         display_df = ranked_df[[
-            'symbol', 'rating_icon', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
+            'symbol', 'rating_icon', 'quadrant', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
         ]].reset_index(drop=True)
         
         display_df.index += 1 
         display_df.columns = [
-            'Symbol', 'Rating', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
+            'Symbol', 'Rating', 'Stock Category', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
         ]
 
         # --- GOD MODE: VISUALIZATION ---
@@ -666,6 +683,7 @@ else:
             column_config={
                 "Symbol": st.column_config.TextColumn(width="small"),
                 "Rating": st.column_config.TextColumn(width="small", help="⭐⭐⭐ = Strong F-Score & Undervalued"),
+                "Stock Category": st.column_config.TextColumn(width="medium", help="Based on Magic Quadrant (P/E vs ROE)"),
                 "Industry": st.column_config.TextColumn(width="medium"),
                 "Magic Score": st.column_config.NumberColumn(format="%.1f", width="small"),
                 "F-Score": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d", width="small"),
