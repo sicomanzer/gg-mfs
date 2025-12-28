@@ -683,8 +683,8 @@ else:
             column_config={
                 "Symbol": st.column_config.TextColumn(width="small"),
                 "Rating": st.column_config.TextColumn(width="small", help="⭐⭐⭐ = Strong F-Score & Undervalued"),
-                "Stock Category": st.column_config.TextColumn(width="medium", help="Based on Magic Quadrant (P/E vs ROE)"),
-                "Industry": st.column_config.TextColumn(width="medium"),
+                "Stock Category": st.column_config.TextColumn(width=150, help="Based on Magic Quadrant (P/E vs ROE)"),
+                "Industry": st.column_config.TextColumn(width=150),
                 "Magic Score": st.column_config.NumberColumn(format="%.1f", width="small"),
                 "F-Score": st.column_config.ProgressColumn(min_value=0, max_value=9, format="%d", width="small"),
                 "Graham Fair Value": st.column_config.NumberColumn(format="%.2f", width="small"),
