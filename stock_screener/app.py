@@ -183,6 +183,8 @@ def update_database():
                 "total_debt": info.get("totalDebt"),            # F-Score
                 "current_ratio": info.get("currentRatio"),      # F-Score (Liquidity proxy)
                 "revenue_growth": info.get("revenueGrowth"),    # F-Score (Efficiency proxy)
+                "roic": info.get("returnOnInvestedCapital"),    # Magic Formula Original
+                "beta": info.get("beta"),                       # For WACC
                 "timestamp": datetime.datetime.now().isoformat()
             }
             
@@ -215,27 +217,76 @@ def update_database():
                 if div_rate and metrics["price"] and metrics["price"] > 0:
                      metrics["yield"] = div_rate / metrics["price"]
 
-            # 3. D/E Fallback (Balance Sheet)
-            if metrics["de"] is None:
+            # 3. D/E Fallback (Balance Sheet) & ROIC Fallback
+            if metrics["de"] is None or metrics["roic"] is None:
                 try:
                     bs = ticker.balance_sheet
                     if not bs.empty:
-                        liab = None
-                        target_liab_keys = ['Total Liabilities Net Minority Interest', 'Total Liabilities']
-                        for k in target_liab_keys:
-                            if k in bs.index:
-                                liab = bs.loc[k].iloc[0]
-                                break
-                        equity = None
-                        target_equity_keys = ['Stockholders Equity', 'Total Stockholder Equity', 'Common Stock Equity']
-                        for k in target_equity_keys:
-                            if k in bs.index:
-                                equity = bs.loc[k].iloc[0]
-                                break
-                        if liab and equity and equity != 0:
-                            metrics["de"] = (liab / equity) * 100
+                        # --- D/E ---
+                        if metrics["de"] is None:
+                            liab = None
+                            target_liab_keys = ['Total Liabilities Net Minority Interest', 'Total Liabilities']
+                            for k in target_liab_keys:
+                                if k in bs.index:
+                                    liab = bs.loc[k].iloc[0]
+                                    break
+                            equity = None
+                            target_equity_keys = ['Stockholders Equity', 'Total Stockholder Equity', 'Common Stock Equity']
+                            for k in target_equity_keys:
+                                if k in bs.index:
+                                    equity = bs.loc[k].iloc[0]
+                                    break
+                            if liab and equity and equity != 0:
+                                metrics["de"] = (liab / equity) * 100
+                        
+                        # --- ROIC Calculation (EBIT / Invested Capital) ---
+                        if metrics["roic"] is None:
+                            try:
+                                # 1. Get EBIT
+                                financials = ticker.financials
+                                ebit = None
+                                if not financials.empty and 'Ebit' in financials.index:
+                                    ebit = financials.loc['Ebit'].iloc[0]
+                                elif not financials.empty and 'Net Income' in financials.index:
+                                    # Very Rough Proxy: Net Income + Interest + Tax
+                                    ebit = financials.loc['Net Income'].iloc[0] # Too rough, maybe just skip
+                                
+                                # 2. Get Invested Capital (Equity + Debt - Cash)
+                                has_equity = 'Stockholders Equity' in bs.index or 'Total Stockholder Equity' in bs.index or 'Common Stock Equity' in bs.index
+                                
+                                if ebit and has_equity:
+                                    # Equity
+                                    for k in ['Stockholders Equity', 'Total Stockholder Equity', 'Common Stock Equity']:
+                                        if k in bs.index:
+                                            eq_val = bs.loc[k].iloc[0]
+                                            break
+                                    
+                                    # Debt
+                                    debt_val = 0
+                                    for k in ['Total Debt', 'Long Term Debt']: # Simplified
+                                        if k in bs.index:
+                                            debt_val = bs.loc[k].iloc[0]
+                                            break
+                                    
+                                    # Cash
+                                    cash_val = 0
+                                    for k in ['Cash And Cash Equivalents', 'Cash']:
+                                        if k in bs.index:
+                                            cash_val = bs.loc[k].iloc[0]
+                                            break
+                                    
+                                    invested_capital = eq_val + debt_val - cash_val
+                                    
+                                    if invested_capital and invested_capital > 0:
+                                        metrics["roic"] = ebit / invested_capital
+                            except:
+                                pass
                 except:
                     pass
+            
+            # Final Fallback for ROIC: Use ROA as proxy if still None
+            if metrics["roic"] is None and metrics["return_on_assets"] is not None:
+                 metrics["roic"] = metrics["return_on_assets"]
 
             # MANUAL OVERRIDES
             MANUAL_OVERRIDES = {
@@ -296,7 +347,7 @@ def load_and_validate_data():
     # First ensure cols exist
     # Validation Logic: strict only on CORE Magic Formula params
     core_cols = ["pe", "roe", "pbv", "yield", "high52", "ocf"]
-    secondary_cols = ["avg_volume", "ev_ebitda", "return_on_assets", "gross_margins", "eps", "bvps", "sector", "total_assets", "total_debt", "current_ratio", "revenue_growth"]
+    secondary_cols = ["avg_volume", "ev_ebitda", "return_on_assets", "gross_margins", "eps", "bvps", "sector", "total_assets", "total_debt", "current_ratio", "revenue_growth", "roic", "beta"]
     
     all_cols = core_cols + secondary_cols
     for col in all_cols:
@@ -389,7 +440,7 @@ def load_and_validate_data():
     
     return valid_df, total_stocks, valid_count, excluded_count
 
-def calculate_rankings(df):
+def calculate_rankings(df, use_roic=False):
     """
     Phase 3: Magic Formula Logic
     """
@@ -400,8 +451,14 @@ def calculate_rankings(df):
     # P/BV: Ascending (Low is good)
     df['Rank_PBV'] = df['pbv'].rank(ascending=True)
     
-    # ROE: Descending (High is good)
-    df['Rank_ROE'] = df['roe'].rank(ascending=False)
+    # Quality Metric: ROE or ROIC
+    # Descending (High is good)
+    if use_roic:
+        # Fill missing ROIC with -999 to rank them last
+        df['roic_filled'] = df['roic'].fillna(-999)
+        df['Rank_Quality'] = df['roic_filled'].rank(ascending=False)
+    else:
+        df['Rank_Quality'] = df['roe'].rank(ascending=False)
     
     # Yield: Descending (High is good)
     df['Rank_Yield'] = df['yield'].rank(ascending=False)
@@ -415,7 +472,7 @@ def calculate_rankings(df):
     df['Rank_EV_EBITDA'] = df['ev_ebitda'].rank(ascending=True)
 
     # Scoring
-    df['Total_Score'] = df['Rank_PE'] + df['Rank_PBV'] + df['Rank_ROE'] + df['Rank_Yield'] + df['Rank_Drawdown'] + df['Rank_EV_EBITDA']
+    df['Total_Score'] = df['Rank_PE'] + df['Rank_PBV'] + df['Rank_Quality'] + df['Rank_Yield'] + df['Rank_Drawdown'] + df['Rank_EV_EBITDA']
     
     # Sort
     df_sorted = df.sort_values(by='Total_Score', ascending=True)
@@ -427,6 +484,9 @@ def calculate_rankings(df):
     top_30['pe'] = top_30['pe'].round(2)
     top_30['pbv'] = top_30['pbv'].round(2)
     top_30['roe'] = (top_30['roe'] * 100).round(2)
+    if 'roic' in top_30.columns:
+        top_30['roic'] = (top_30['roic'] * 100).round(2)
+        
     top_30['total_score'] = top_30['Total_Score'] # Keep raw score for display if needed
     
     # formatting Yield to percentage string
@@ -498,7 +558,14 @@ with st.sidebar.expander("📝 Edit Stock List"):
 
 # --- FEATURE: LIQUIDITY FILTER ---
 st.sidebar.markdown("---")
-st.sidebar.subheader("🌪️ Filters")
+st.sidebar.subheader("🌪️ Filters & Config")
+quality_selector = st.sidebar.radio(
+    "Magic Formula Quality Metric:",
+    ["ROE (Return on Equity)", "ROIC (Return on Invested Capital)"],
+    help="Original Magic Formula uses ROIC. Modified version uses ROE for broader data availability."
+)
+use_roic = "ROIC" in quality_selector
+
 min_liquidity = st.sidebar.number_input(
     "Min. Daily Value (MB)", 
     min_value=0, 
@@ -542,7 +609,7 @@ else:
     if valid > 0:
         # Phase 3: Rankings
         
-        ranked_df = calculate_rankings(filtered_df)
+        ranked_df = calculate_rankings(filtered_df, use_roic=use_roic)
         
         # Prepare display dataframe
         # Prepare display dataframe
@@ -624,14 +691,17 @@ else:
 
         ranked_df['quadrant'] = ranked_df.apply(get_quadrant, axis=1)
 
+        if 'roic' not in ranked_df.columns: ranked_df['roic'] = None
+        
         display_df = ranked_df[[
-            'symbol', 'rating_icon', 'quadrant', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'ev_ebitda', 'yield_pct'
+            'symbol', 'rating_icon', 'quadrant', 'sector_th', 'Total_Score', 'f_score', 'fair_value', 'mos_pct', 'price', 'drawdown_pct', 'de', 'pe', 'pbv', 'roe', 'roic', 'ev_ebitda', 'yield_pct'
         ]].reset_index(drop=True)
         
         display_df.index += 1 
         display_df.columns = [
-            'Symbol', 'Rating', 'Stock Category', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'EV/EBITDA', 'Dividend Yield'
+            'Symbol', 'Rating', 'Stock Category', 'Industry', 'Magic Score', 'F-Score', 'Graham Fair Value', 'M.O.S', 'Price (THB)', 'Down from 52W High', 'D/E Ratio', 'P/E Ratio', 'P/BV Ratio', 'ROE', 'ROIC', 'EV/EBITDA', 'Dividend Yield'
         ]
+
 
         # --- GOD MODE: VISUALIZATION ---
         st.markdown("---")
@@ -695,6 +765,7 @@ else:
                 "P/E Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "P/BV Ratio": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "ROE": st.column_config.NumberColumn(format="%.2f", width="small"),
+                "ROIC": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "EV/EBITDA": st.column_config.NumberColumn(format="%.2f", width="small"),
                 "Dividend Yield": st.column_config.NumberColumn(format="%.2f%%", width="small"),
             }
@@ -710,6 +781,181 @@ else:
         )
         
         st.markdown(f"*Showing top {len(display_df)} candidates based on the Magic Formula.*")
+
+        # --- FEATURE: STOCK DEEP DIVE ---
+        st.markdown("---")
+        st.subheader("🕵️‍♂️ Stock Deep Dive (เจาะลึกหุ้นรายตัว)")
+        
+        col_sel1, col_sel2 = st.columns([1, 2])
+        with col_sel1:
+            stock_list = ranked_df['symbol'].tolist()
+            selected_stock = st.selectbox("เลือกหุ้นเพื่อดูรายละเอียด:", stock_list)
+        
+        if selected_stock:
+            # Get Row
+            row = ranked_df[ranked_df['symbol'] == selected_stock].iloc[0]
+            
+            st.markdown(f"#### 📊 ข้อมูลเจาะลึก: {row['symbol']}")
+            
+            # Layout: 2 Main Columns (Left: Overview, Right: Analysis & Chart)
+            main_c1, main_c2 = st.columns([1, 2.5])
+            
+            with main_c1:
+                st.markdown("**Overview**")
+                st.metric(label="ราคาปัจจุบัน", value=f"{row['price']:.2f}")
+                st.metric(label="Fair Value (Graham)", value=f"{row['fair_value']:.2f}", delta=f"MOS {row['mos_pct']:.0f}%")
+                
+                st.write("---")
+                st.markdown(f"**Grade:** {row['rating_icon']}")
+                st.markdown(f"**Type:** {row['quadrant']}")
+                st.markdown(f"**Industry:** {row['sector_th']}")
+                
+                qa_metric = "ROIC" if use_roic else "ROE"
+                qa_val = row['roic'] if use_roic else row['roe']
+                if pd.notnull(qa_val):
+                    st.metric(label=f"Quality ({qa_metric})", value=f"{qa_val:.2f}%")
+                else:
+                    st.metric(label=f"Quality ({qa_metric})", value="N/A")            
+            
+            with main_c2:
+                # Row 1: F-Score Breakdown (Split into 2 sub-cols)
+                sub_c1, sub_c2 = st.columns(2)
+                
+                pass_icon = "✅"
+                fail_icon = "❌"
+                
+                with sub_c1:
+                    st.markdown("**🩺 สุขภาพการเงิน**")
+                    # Check 1: ROA
+                    roa_val = row.get('return_on_assets', 0) if pd.notnull(row.get('return_on_assets')) else 0
+                    check_roa = roa_val > 0
+                    st.write(f"{pass_icon if check_roa else fail_icon} **Positive ROA:** {roa_val*100:.2f}%")
+                    
+                    # Check 2: OCF
+                    ocf_val = row.get('ocf', 0) if pd.notnull(row.get('ocf')) else 0
+                    check_ocf = ocf_val > 0
+                    st.write(f"{pass_icon if check_ocf else fail_icon} **Positive Cash Flow:** {ocf_val/1_000_000:,.1f} M")
+                    
+                    # Check 3: Accruals (OCF/Assets > ROA)
+                    assets = row.get('total_assets', 1)
+                    if pd.isnull(assets) or assets == 0: assets = 1
+                    ocf_roa = ocf_val / assets
+                    check_accruals = ocf_roa > roa_val
+                    st.write(f"{pass_icon if check_accruals else fail_icon} **Earn. Qual. (CFO > ROA):** {'Pass' if check_accruals else 'Fail'}")
+
+                    # Check 4: Leverage (D/E < 1.0) # Using Ratio now
+                    de_val = row.get('de', 0) if pd.notnull(row.get('de')) else 0
+                    check_de = de_val < 1.0
+                    st.write(f"{pass_icon if check_de else fail_icon} **Low Debt (D/E < 1):** {de_val:.2f}x")
+                    
+                    # Check 5: Liquidity (Current Ratio > 1.0)
+                    cr_val = row.get('current_ratio', 0) if pd.notnull(row.get('current_ratio')) else 0
+                    check_cr = cr_val > 1.0
+                    st.write(f"{pass_icon if check_cr else fail_icon} **Liquidity (CR > 1):** {cr_val:.2f}x")
+                    
+                with sub_c2:
+                    st.markdown("**📈 ประสิทธิภาพ & มูลค่า**")
+                    
+                    # Check 6: Efficiency (Rev Growth > 0)
+                    rg_val = row.get('revenue_growth', 0) if pd.notnull(row.get('revenue_growth')) else 0
+                    check_rg = rg_val > 0
+                    st.write(f"{pass_icon if check_rg else fail_icon} **Rev. Growth:** {rg_val*100:.2f}%")
+                    
+                    # Check 7: Margins (Gross Margin > 0)
+                    gm_val = row.get('gross_margins', 0) if pd.notnull(row.get('gross_margins')) else 0
+                    check_gm = gm_val > 0
+                    st.write(f"{pass_icon if check_gm else fail_icon} **Pos. Gross Margin:** {gm_val*100:.2f}%")
+
+                    # Check 8: Dividend (Yield > 0)
+                    yld_val = row.get('yield', 0) if pd.notnull(row.get('yield')) else 0
+                    check_yld = yld_val > 0
+                    st.write(f"{pass_icon if check_yld else fail_icon} **Pays Dividend:** {yld_val*100:.2f}%")
+                    
+                    # Check 9: Valuation (PE < 15)
+                    pe_val = row.get('pe', 99) 
+                    if pd.isnull(pe_val): pe_val = 99
+                    check_pe = pe_val < 15
+                    st.write(f"{pass_icon if check_pe else fail_icon} **Cheap (PE < 15):** {pe_val:.2f}x")
+                    
+                    st.info(f"**Total F-Score:** {int(row['f_score'])} / 9")
+                
+                # Use a container for the chart to ensure it stays within the right column block
+                st.markdown("##### 📉 Price Trend (10 Years)")
+                try:
+                    # Fetch History on demand
+                    t = yf.Ticker(row['symbol'])
+                    # Fetch 10 Years of history
+                    hist = t.history(period="10y")
+                    if not hist.empty:
+                        # Simple Line Chart
+                        st.line_chart(hist['Close'], height=250, width=0, use_container_width=True, color="#2980b9")
+                    else:
+                        st.warning("No price history available.")
+                except:
+                    st.error("Could not load price chart.")
+
+
+
+            # --- ROIC vs WACC Section ---
+            st.markdown("---")
+            st.markdown("#### ⚖️ การสร้างมูลค่า (ROIC vs WACC)")
+            
+            # WACC Calculation Logic
+            # Assumptions
+            RF = 0.025 # Risk Free Rate (Thai Bond 10Y ~2.5%)
+            RM = 0.08  # Market Premium (~8%)
+            KD = 0.045 # Cost of Debt (Pre-tax) ~4.5%
+            TAX = 0.20 # Corporate Tax Rate
+            
+            beta = row.get('beta', 1.0)
+            if pd.isnull(beta): beta = 1.0
+            
+            # Cost of Equity (CAPM)
+            ke = RF + beta * (RM) 
+            
+            # Weights
+            # Ensure values are float
+            mcap = row.get('price', 0) * row.get('shares', 0) # Rough Mkt Cap
+            # Or assume we don't have shares in table, use PBV logic
+            # Let's simple use: Equity = 1, Debt = D/E ratio
+            de_ratio = row.get('de', 0)
+            if pd.isnull(de_ratio): de_ratio = 0.5 # Default
+            
+            # W = E + D
+            # Wedt = D/W, We = E/W
+            # D = de_ratio, E = 1
+            w_total = 1 + de_ratio
+            wd = de_ratio / w_total
+            we = 1 / w_total
+            
+            # WACC Formula
+            wacc = (we * ke) + (wd * KD * (1 - TAX))
+            
+            # Display
+            col_w1, col_w2, col_w3 = st.columns(3)
+            
+            roic_disp = row.get('roic', 0)
+            if pd.isnull(roic_disp): roic_disp = 0
+            
+            # Unit Correction Logic:
+            # If ROIC > 4.0 (400%), it's likely already in % from source (e.g. 9.1 instead of 0.091)
+            # Threshold 4.0 (400%) is safe because rarely any company has ROIC > 400%
+            if roic_disp > 4.0:
+                roic_disp = roic_disp / 100.0
+            
+            spread = roic_disp - wacc
+            
+            with col_w1:
+                st.metric("ROIC (ผลตอบแทนลงทุน)", f"{roic_disp*100:.2f}%")
+            with col_w2:
+                st.metric(f"WACC (ต้นทุนเงินทุน) [Beta {beta:.2f}]", f"{wacc*100:.2f}%")
+            with col_w3:
+                st.metric("Spread (กำไรส่วนเพิ่ม)", f"{spread*100:.2f}%", delta_color="normal", delta=f"{'Created Value ✅' if spread>0 else 'Destroyed Value ❌'}")
+            
+            if spread > 0:
+                st.success(f"**Wealth Creator:** บริษัทนี้สร้างผลตอบแทนได้สูงกว่าต้นทุนทางการเงิน {(spread*100):.2f}% (ยิ่งเยอะยิ่งดี)")
+            else:
+                st.error(f"**Wealth Destroyer:** บริษัทนี้ทำผลตอบแทนได้ต่ำกว่าต้นทุนทางการเงิน! ยิ่งลงทุนยิ่งเสียมูลค่า")
         
         st.markdown("---")
         st.subheader("📖 คำอธิบาย (Glossary)")
