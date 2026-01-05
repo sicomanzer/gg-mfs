@@ -3,6 +3,7 @@ import pandas as pd
 import yfinance as yf
 import json
 import os
+import random
 import datetime
 import time
 import altair as alt
@@ -309,7 +310,14 @@ def update_database():
         progress_bar.progress(progress)
         status_text.write(f"Fetching {symbol} ({i+1}/{total})")
         
-        time.sleep(0.1) 
+        # Rate Limit Mitigation for Render/Cloud
+        # 1. Random sleep 1-3 seconds
+        sleep_time = random.uniform(1.0, 3.0)
+        time.sleep(sleep_time)
+        
+        # 2. Cool down every 10 stocks
+        if (i + 1) % 10 == 0:
+            time.sleep(5) 
         
     with open(DATA_FILE, 'w') as f:
         json.dump(data_list, f, indent=4)
