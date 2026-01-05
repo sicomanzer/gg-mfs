@@ -805,6 +805,39 @@ else:
                 st.metric(label="ราคาปัจจุบัน", value=f"{row['price']:.2f}")
                 st.metric(label="Fair Value (Graham)", value=f"{row['fair_value']:.2f}", delta=f"MOS {row['mos_pct']:.0f}%")
                 
+                # --- DDM Valuation ---
+                try:
+                    # Constants
+                    rf_rate = 0.025
+                    mkt_prem = 0.08
+                    g_rate = 0.03 # Conservative Growth 3%
+                    
+                    # Vars
+                    beta_val = row.get('beta', 1.0)
+                    if pd.isnull(beta_val): beta_val = 1.0
+                    
+                    div_yield = row.get('yield', 0)
+                    if pd.isnull(div_yield): div_yield = 0
+                    
+                    # Calc Ke (CAPM) with Safety Floor
+                    raw_ke = rf_rate + (beta_val * (mkt_prem - rf_rate)) 
+                    ke_val = max(raw_ke, 0.06) # Floor Ke at 6% (Min expected return)
+
+                    d0 = row['price'] * div_yield
+                    d1 = d0 * (1 + g_rate)
+                    
+                    # Ensure Denominator is healthy (Min Spread 2%)
+                    spread = ke_val - g_rate
+                    
+                    if spread >= 0.02 and d0 > 0:
+                        ddm_val = d1 / spread
+                        mos_ddm = ((ddm_val - row['price']) / ddm_val) * 100
+                        st.metric(label="Fair Value (DDM)", value=f"{ddm_val:.2f}", delta=f"MOS {mos_ddm:.0f}%", help="DDM (g=3%, Min Ke=6%)")
+                    else:
+                        st.metric(label="Fair Value (DDM)", value="N/A", help="Ke too low or No Dividend")
+                except:
+                    pass
+                
                 st.write("---")
                 st.markdown(f"**Grade:** {row['rating_icon']}")
                 st.markdown(f"**Type:** {row['quadrant']}")
@@ -900,35 +933,40 @@ else:
             st.markdown("---")
             st.markdown("#### ⚖️ การสร้างมูลค่า (ROIC vs WACC)")
             
-            # WACC Calculation Logic
+            # WACC Calculation Logic (Conservative)
             # Assumptions
             RF = 0.025 # Risk Free Rate (Thai Bond 10Y ~2.5%)
             RM = 0.08  # Market Premium (~8%)
             KD = 0.045 # Cost of Debt (Pre-tax) ~4.5%
             TAX = 0.20 # Corporate Tax Rate
             
-            beta = row.get('beta', 1.0)
-            if pd.isnull(beta): beta = 1.0
+            raw_beta = row.get('beta', 1.0)
+            if pd.isnull(raw_beta): raw_beta = 1.0
             
-            # Cost of Equity (CAPM)
-            ke = RF + beta * (RM) 
+            # 1. Adjust Beta (Clamp outliers)
+            # Beta < 0.6 is unrealistic for most stocks (unless defensive/utility). 
+            # Beta > 2.0 is extreme volatility.
+            adj_beta = max(0.6, min(raw_beta, 2.5))
+            
+            # 2. Cost of Equity (CAPM) with Floor
+            # Ke = Rf + Beta * Rm_Premium
+            calc_ke = RF + adj_beta * (RM) 
+            ke = max(calc_ke, 0.06) # Floor Ke at 6% (Min Investor Expectation)
             
             # Weights
             # Ensure values are float
-            mcap = row.get('price', 0) * row.get('shares', 0) # Rough Mkt Cap
-            # Or assume we don't have shares in table, use PBV logic
-            # Let's simple use: Equity = 1, Debt = D/E ratio
-            de_ratio = row.get('de', 0)
-            if pd.isnull(de_ratio): de_ratio = 0.5 # Default
+            mcap = row.get('price', 0) * row.get('shares', 0)
             
-            # W = E + D
-            # Wedt = D/W, We = E/W
-            # D = de_ratio, E = 1
-            w_total = 1 + de_ratio
-            wd = de_ratio / w_total
-            we = 1 / w_total
+            # Note: 'de' (Debt/Equity) in our DB is stored as Percentage (e.g. 150.0 = 150%)
+            raw_de_pct = row.get('de', 0) 
+            if pd.isnull(raw_de_pct): raw_de_pct = 50.0 # Default 50%
             
-            # WACC Formula
+            de_ratio = raw_de_pct / 100.0 # Convert to Decimal Ratio (e.g. 1.5)
+            
+            # WACC Formula: Ke*We + Kd*(1-Tax)*Wd
+            we = 1 / (1 + de_ratio)
+            wd = de_ratio / (1 + de_ratio)
+            
             wacc = (we * ke) + (wd * KD * (1 - TAX))
             
             # Display
@@ -948,7 +986,7 @@ else:
             with col_w1:
                 st.metric("ROIC (ผลตอบแทนลงทุน)", f"{roic_disp*100:.2f}%")
             with col_w2:
-                st.metric(f"WACC (ต้นทุนเงินทุน) [Beta {beta:.2f}]", f"{wacc*100:.2f}%")
+                st.metric(f"WACC (ต้นทุนเงินทุน) [Beta {adj_beta:.2f}]", f"{wacc*100:.2f}%")
             with col_w3:
                 st.metric("Spread (กำไรส่วนเพิ่ม)", f"{spread*100:.2f}%", delta_color="normal", delta=f"{'Created Value ✅' if spread>0 else 'Destroyed Value ❌'}")
             
