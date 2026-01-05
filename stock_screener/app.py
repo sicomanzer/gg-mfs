@@ -806,6 +806,7 @@ else:
                 st.metric(label="Fair Value (Graham)", value=f"{row['fair_value']:.2f}", delta=f"MOS {row['mos_pct']:.0f}%")
                 
                 # --- DDM Valuation ---
+                ddm_val_calc = None  # Store for MOS section
                 try:
                     # Constants
                     rf_rate = 0.025
@@ -831,6 +832,7 @@ else:
                     
                     if spread >= 0.02 and d0 > 0:
                         ddm_val = d1 / spread
+                        ddm_val_calc = ddm_val # STORE IT
                         mos_ddm = ((ddm_val - row['price']) / ddm_val) * 100
                         st.metric(label="Fair Value (DDM)", value=f"{ddm_val:.2f}", delta=f"MOS {mos_ddm:.0f}%", help="DDM (g=3%, Min Ke=6%)")
                     else:
@@ -878,8 +880,9 @@ else:
 
                     # Check 4: Leverage (D/E < 1.0) # Using Ratio now
                     de_val = row.get('de', 0) if pd.notnull(row.get('de')) else 0
-                    check_de = de_val < 1.0
-                    st.write(f"{pass_icon if check_de else fail_icon} **Low Debt (D/E < 1):** {de_val:.2f}x")
+                    de_ratio_disp = de_val # It is already stored as ratio
+                    check_de = de_ratio_disp < 1.0
+                    st.write(f"{pass_icon if check_de else fail_icon} **Low Debt (D/E < 1):** {de_ratio_disp:.2f}x")
                     
                     # Check 5: Liquidity (Current Ratio > 1.0)
                     cr_val = row.get('current_ratio', 0) if pd.notnull(row.get('current_ratio')) else 0
@@ -928,6 +931,77 @@ else:
                     st.error("Could not load price chart.")
 
 
+
+            # --- Margin of Safety Scenarios ---
+            st.markdown("---")
+            st.markdown("#### 🛡️ Margin of Safety Buying Zones")
+            
+            # Selector
+            val_method = st.radio("เลือกโมเดล (Valuation Base):", ["Graham (Assets/EPS)", "DDM (Dividend/Cashflow)"], horizontal=True)
+            
+            base_fv = 0
+            is_valid_method = True
+            
+            if val_method.startswith("Graham"):
+                base_fv = row['fair_value']
+            else: # DDM selected
+                if ddm_val_calc is not None:
+                     base_fv = ddm_val_calc
+                else:
+                     is_valid_method = False
+            
+            if is_valid_method and base_fv > 0:
+                st.caption(f"ราคาที่ควรซื้อเมื่อเผื่อส่วนลดความปลอดภัย (อ้างอิง Fair Value: {base_fv:.2f})")
+                
+                # Grids
+                m1, m2 = st.columns(2)
+                m3, m4 = st.columns(2)
+                
+                # MOS Prices
+                mos30 = base_fv * (1 - 0.30)
+                mos40 = base_fv * (1 - 0.40)
+                mos50 = base_fv * (1 - 0.50) # Buffett Zone
+                mos60 = base_fv * (1 - 0.60) # Deep Value
+                
+                curr_price = row['price']
+                
+                # Check Zones
+                # Passed = Price is LOWER than MOS level
+                p30 = "✅" if curr_price < mos30 else ""
+                p40 = "✅" if curr_price < mos40 else ""
+                p50 = "✅" if curr_price < mos50 else ""
+                p60 = "✅" if curr_price < mos60 else ""
+                
+                # Highlight "Current Best Zone" (The deepest valid level)
+                h30 = h40 = h50 = h60 = ""
+                if curr_price < mos60: h60 = "✨ YOU ARE HERE"
+                elif curr_price < mos50: h50 = "✨ YOU ARE HERE"
+                elif curr_price < mos40: h40 = "👈 YOU ARE HERE"
+                elif curr_price < mos30: h30 = "👈 YOU ARE HERE"
+                
+                with m1:
+                    st.error(f"**MOS 30%:** {mos30:.2f} {p30} {h30}")
+                with m2:
+                    st.warning(f"**MOS 40%:** {mos40:.2f} {p40} {h40}")
+                with m3:
+                    st.success(f"**MOS 50%:** {mos50:.2f} {p50} {h50}")
+                with m4:
+                    st.info(f"**MOS 60%:** {mos60:.2f} {p60} {h60}")
+
+                # Current Status Box
+                # Recalculate discount based on NEW base_fv
+                curr_discount = ((base_fv - row['price']) / base_fv) * 100
+                
+                st.markdown("")
+                if curr_discount > 30:
+                    st.success(f"✅ **ราคาดีมาก:** ปัจจุบันลดราคา {curr_discount:.1f}% จากมูลค่าจริง")
+                elif curr_discount > 0:
+                    st.info(f"🆗 **พอใช้ได้:** ปัจจุบันลดราคา {curr_discount:.1f}% (Margin บาง)")
+                else:
+                    extra_prem = abs(curr_discount)
+                    st.error(f"❌ **แพงไป:** ราคาเกินมูลค่าอยู่ {extra_prem:.1f}%")
+            else:
+                 st.warning("⚠️ ไม่สามารถคำนวณโมเดลนี้ได้ (ไม่มีปันผล หรือ ข้อมูลไม่เพียงพอ)")
 
             # --- ROIC vs WACC Section ---
             st.markdown("---")
