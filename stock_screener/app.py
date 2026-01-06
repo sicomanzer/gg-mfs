@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 import pandas as pd
 import yfinance as yf
 import json
@@ -7,6 +8,7 @@ import random
 import datetime
 import time
 import altair as alt
+
 
 # --- CONFIGURATION ---
 DATA_FILE = "set100_db.json"
@@ -147,17 +149,39 @@ def update_database():
     progress_bar = st.sidebar.progress(0)
     status_text = st.sidebar.empty()
     
+    # Create a spoofed session to bypass basic IP blocks
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    })
+
     symbols = get_set100_symbols()
+    
+    # Check if empty (e.g. bad user edit)
+    if not symbols:
+        st.sidebar.warning("⚠️ Stock list is blank! Using fallback list.")
+        symbols = [f"{s}.BK" for s in FALLBACK_SET100]
+
     total = len(symbols)
     data_list = []
+    errors = [] # Track errors
     
-    status_text.write("🚀 Starting Data Extraction (Fundamental + Technical)...")
+    status_text.write("🚀 Starting Update... (Please wait)")
     
     for i, symbol in enumerate(symbols):
         try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
-            
+            # Try with Spoofed Session first (Best for Rate Limit)
+            try:
+                ticker = yf.Ticker(symbol, session=session)
+                # Test fetch
+                info = ticker.info 
+                if info is None: raise ValueError("Info is None")
+            except Exception as session_err:
+                # Fallback to standard request if session fails (e.g. yfinance version issue)
+                # print(f"Session failed for {symbol}: {session_err}, trying standard...")
+                ticker = yf.Ticker(symbol)
+                info = ticker.info
+
             # Extract metrics (using .get for safety)
             # Depending on yfinance version, keys might vary, but these are standard
             metrics = {
@@ -304,7 +328,8 @@ def update_database():
             data_list.append(metrics)
             
         except Exception as e:
-            print(f"Error fetching {symbol}: {e}")
+            # print(f"Error fetching {symbol}: {e}")
+            errors.append(f"{symbol}: {str(e)}")
             
         progress = (i + 1) / total
         progress_bar.progress(progress)
@@ -318,7 +343,16 @@ def update_database():
         # 2. Cool down every 10 stocks
         if (i + 1) % 10 == 0:
             time.sleep(5) 
-        
+            
+    # --- SAFETY CHECK: DON'T SAVE IF EMPTY ---
+    if not data_list:
+        st.sidebar.error("❌ Update Failed: No data fetched!")
+        st.sidebar.warning("Possible reasons: Connection blocked (429), Empty list, or Yahoo API change.")
+        if errors:
+            with st.sidebar.expander("Show Errors"):
+                st.write(errors)
+        return # EXIT WITHOUT SAVING
+
     with open(DATA_FILE, 'w') as f:
         json.dump(data_list, f, indent=4)
         
