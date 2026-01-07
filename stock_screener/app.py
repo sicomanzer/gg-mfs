@@ -837,6 +837,77 @@ else:
             # Get Row
             row = ranked_df[ranked_df['symbol'] == selected_stock].iloc[0]
             
+            # --- AI INVESTMENT CALL LOGIC ---
+            # 1. Valuation Check (Based on Graham MOS)
+            mos_pct = row['mos_pct']
+            
+            # 2. Quality Check (F-Score)
+            f_score = row.get('f_score', 0)
+            
+            # 3. Decision Matrix
+            rec_status = "HOLD"
+            rec_color = "gray"
+            rec_reason = "พื้นฐานปานกลาง ราคาเหมาะสม"
+            
+            if mos_pct >= 40: # Deeply Undervalued
+                if f_score >= 7:
+                    rec_status = "STRONG BUY (ซื้อสะสม)"
+                    rec_color = "green"
+                    rec_reason = "💎 หุ้นห่านทองคำ: ราคาถูกมาก (MOS > 40%) และพื้นฐานแกร่ง (F-Score สูง)"
+                elif f_score >= 5:
+                    rec_status = "BUY (ทยอยซื้อ)"
+                    rec_color = "lightgreen"
+                    rec_reason = "✅ หุ้นดีราคาถูก: มีส่วนลดเยอะ (MOS > 40%) พื้นฐานผ่านเกณฑ์"
+                else:
+                    rec_status = "WAIT (รอคอย)"
+                    rec_color = "orange"
+                    rec_reason = "⚠️ กับดักมูลค่า?: ราคาถูกแต่พื้นฐานอ่อนแอ (F-Score ต่ำ) // โปรดเช็ดงบ"
+                    
+            elif mos_pct >= 10: # Undervalued
+                if f_score >= 6:
+                    rec_status = "BUY (ซื้อ)"
+                    rec_color = "lightgreen"
+                    rec_reason = "✅ หุ้นดีมีส่วนลด: ราคาต่ำกว่ามูลค่า (MOS > 10%) พื้นฐานดี"
+                else:
+                    rec_status = "HOLD (ถือ/รอ)"
+                    rec_color = "yellow"
+                    rec_reason = "🟡 ราคาเริ่มน่าสนใจ แต่พื้นฐานยังไม่แน่นปึก"
+                    
+            elif mos_pct >= -10: # Fair Value (approx)
+                if f_score >= 7:
+                    rec_status = "HOLD (ถือ)"
+                    rec_color = "blue"
+                    rec_reason = "🛡️ หุ้นแกร่ง: ราคายุติธรรม เน้นถือรับปันผล/Growth"
+                else:
+                    rec_status = "WAIT (รอ)"
+                    rec_color = "orange"
+                    rec_reason = "🟠 ราคาแฟร์แต่พื้นฐานไม่เด่น รอจังหวะย่อตัว"
+            
+            else: # Overvalued
+                if f_score >= 8:
+                    rec_status = "HOLD (ถือรอขาย)"
+                    rec_color = "blue"
+                    rec_reason = "💎 ของดีราคาแพง: พื้นฐานเทพ แต่อาจจะแพงไปนิด ถือลุ้น Growth ต่อได้"
+                else:
+                    rec_status = "SELL (พิจารณาขาย)"
+                    rec_color = "red"
+                    rec_reason = "❌ แพงเกินพื้นฐาน: ราคาเกินมูลค่าและคุณภาพไม่รองรับ"
+
+            # Display Recommendation Banner
+            st.markdown(f"""
+                <div style="
+                    background-color: {rec_color}; 
+                    padding: 15px; 
+                    border-radius: 10px; 
+                    color: {'white' if rec_color in ['green', 'red', 'blue'] else 'black'}; 
+                    text-align: center; 
+                    margin-bottom: 20px;
+                    opacity: 0.9;">
+                    <h2 style="margin:0; color: inherit;">🎯 {rec_status}</h2>
+                    <p style="margin:5px 0 0 0; font-size: 16px;">{rec_reason}</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
             st.markdown(f"#### 📊 ข้อมูลเจาะลึก: {row['symbol']}")
             
             # Layout: 2 Main Columns (Left: Overview, Right: Analysis & Chart)
