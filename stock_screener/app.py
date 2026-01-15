@@ -11,7 +11,9 @@ import altair as alt
 
 
 # --- CONFIGURATION ---
-DATA_FILE = "set100_db.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(BASE_DIR, "set100_db.json")
+SOURCE_FILE = os.path.join(BASE_DIR, "source_set100.txt")
 
 st.set_page_config(
     page_title="SET100 Magic Formula Screener",
@@ -125,9 +127,8 @@ def get_set100_symbols():
     """
     Reads SET100 symbols from external text file for easy updates.
     """
-    source_file = "source_set100.txt"
-    if os.path.exists(source_file):
-        with open(source_file, "r") as f:
+    if os.path.exists(SOURCE_FILE):
+        with open(SOURCE_FILE, "r") as f:
             lines = [line.strip() for line in f if line.strip()]
         
         # Add .BK if missing
@@ -591,7 +592,7 @@ with st.sidebar.expander("📝 Edit Stock List"):
     if st.button("Save List"):
         new_symbols = [s.strip().upper() for s in new_list_str.split('\n') if s.strip()]
         # Save to file
-        with open("source_set100.txt", "w") as f:
+        with open(SOURCE_FILE, "w") as f:
             for s in new_symbols:
                 f.write(s + "\n")
         st.success("List saved! Please click 'Update Database' to fetch new data.")
