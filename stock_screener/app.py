@@ -403,18 +403,30 @@ def load_and_validate_data():
         df[col] = pd.to_numeric(df[col], errors='coerce')
         
     # Filter: Drop only if CORE metrics are missing
-    valid_df = df.dropna(subset=core_cols) 
+    # valid_df = df.dropna(subset=core_cols) 
     
-    # Drop 0s in core metrics (some can be effectively 0 but let's stick to safe Magic Formula rules)
-    for col in ["pe", "pbv"]: # Yield can be 0, ROE can be 0 or negative
-         valid_df = valid_df[valid_df[col] != 0]
+    # We will now track exclusions instead of just dropping
+    df['exclusion_reason'] = None
+    
+    # 1. Check Missing Core Data
+    missing_mask = df[core_cols].isna().any(axis=1)
+    df.loc[missing_mask, 'exclusion_reason'] = 'Missing Core Data'
+    
+    # 2. Check Zero PE/PBV (Only if not already excluded)
+    # Note: Yield can be 0 (No dividend), but PE/PBV usually shouldn't be 0 for valid companies in this context
+    zero_mask = (df['pe'] == 0) | (df['pbv'] == 0)
+    df.loc[zero_mask & df['exclusion_reason'].isnull(), 'exclusion_reason'] = 'Zero PE or PBV'
 
     # --- NEW: EARNINGS QUALITY FILTER ---
     # Must have Positive Operating Cash Flow
-    # We allow None to pass if we want to be lenient, but for "Quality" we should strict.
-    # Check if 'ocf' is valid (not None/NaN is already handled by dropna above)
-    # Now check > 0
-    valid_df = valid_df[valid_df['ocf'] > 0]
+    # 3. Check Negative OCF
+    # We allow None to pass if we want to be lenient (caught by missing above), but check <= 0 here
+    ocf_mask = df['ocf'] <= 0
+    df.loc[ocf_mask & df['exclusion_reason'].isnull(), 'exclusion_reason'] = 'Negative/Zero Operating Cash Flow'
+    
+    # Split DataFrames
+    valid_df = df[df['exclusion_reason'].isnull()].copy()
+    excluded_df = df[df['exclusion_reason'].notnull()].copy()
     
     # Calculate Piotroski F-Score (Simplified with available data)
     # We use a simplified version because full history is expensive to fetch in loop
@@ -481,7 +493,7 @@ def load_and_validate_data():
     valid_count = len(valid_df)
     excluded_count = total_stocks - valid_count
     
-    return valid_df, total_stocks, valid_count, excluded_count
+    return valid_df, excluded_df, total_stocks, valid_count, excluded_count
 
 def calculate_rankings(df, use_roic=False):
     """
@@ -623,7 +635,7 @@ result = load_and_validate_data()
 if result is None:
     st.warning("⚠️ Database not found or empty. Please click 'Update Database' in the sidebar.")
 else:
-    df_clean, total, valid, excluded = result
+    df_clean, df_excluded, total, valid, excluded = result
 
     # --- APPLY LIQUIDITY FILTER ---
     # Handle missing column for backward compatibility (if user hasn't updated DB yet)
@@ -642,10 +654,30 @@ else:
     col3.metric("Low Liquidity", liquidity_excluded)
     col4.metric("Excluded (Bad Data)", excluded)
     
-    with st.expander("See Exclusion Criteria"):
+    with st.expander("See Exclusion Criteria & Details"):
         st.write("1. Must have valid P/E, P/BV, ROE, Dividend Yield.")
         st.write("2. Must have **Positive Operating Cash Flow** (Earnings Quality Rule).")
         st.write("3. Must have non-zero values for key metrics.")
+        
+        if not df_excluded.empty:
+            st.markdown("---")
+            st.error(f"❌ Found {len(df_excluded)} excluded stocks:")
+            
+            # Format for better display
+            display_excl = df_excluded[['symbol', 'exclusion_reason', 'pe', 'pbv', 'ocf', 'yield']].copy()
+            # Handle formatting if needed, but raw is fine for debug
+            st.dataframe(
+                display_excl, 
+                use_container_width=True,
+                column_config={
+                    "symbol": "Symbol",
+                    "exclusion_reason": st.column_config.TextColumn("Reason", width="medium"),
+                    "pe": st.column_config.NumberColumn("P/E", format="%.2f"),
+                    "pbv": st.column_config.NumberColumn("P/BV", format="%.2f"),
+                    "ocf": st.column_config.NumberColumn("OCF", format="%.0f"),
+                    "yield": st.column_config.NumberColumn("Yield", format="%.2%"),
+                }
+            )
     
 
     
