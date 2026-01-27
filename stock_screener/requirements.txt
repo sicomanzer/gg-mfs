@@ -3,4 +3,5 @@ pandas
 yfinance
 lxml
 beautifulsoup4
-html5lib
+gspread
+google-auth

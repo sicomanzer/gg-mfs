@@ -8,12 +8,195 @@ import random
 import datetime
 import time
 import altair as alt
-
+import gspread
+from google.oauth2.service_account import Credentials
 
 # --- CONFIGURATION ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "set100_db.json")
 SOURCE_FILE = os.path.join(BASE_DIR, "source_set100.txt")
+
+# --- GOOGLE SHEETS CONFIG ---
+# Define scopes for Google Sheets API
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+class DataManager:
+    """
+    Manages data persistence: tries Google Sheets first, falls back to local JSON.
+    """
+    def __init__(self):
+        self.use_cloud = False
+        self.gc = None
+        self.sh = None
+        self.sheet_data = None    # Worksheet object for stock data
+        self.sheet_config = None  # Worksheet object for config (symbol list)
+        
+        # Check for Google Secrets
+        try:
+            if "gcp_service_account" in st.secrets:
+                try:
+                    # Load credentials from Streamlit secrets
+                    creds_dict = dict(st.secrets["gcp_service_account"])
+                    creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+                    self.gc = gspread.authorize(creds)
+                    
+                    # Open Spreadsheet (Key or Name)
+                    # Recommend adding "sheet_url" or "sheet_name" to secrets as well
+                    sheet_url = st.secrets.get("sheet_url")
+                    if sheet_url:
+                        self.sh = self.gc.open_by_url(sheet_url)
+                        self.use_cloud = True
+                        # Initialize tabs if not exist
+                        self._init_sheets()
+                except Exception as e:
+                    print(f"Cloud Connection Failed: {e}")
+                    self.use_cloud = False
+        except FileNotFoundError:
+             # Secrets file not found (Local Dev), ignore and use local mode
+             self.use_cloud = False
+        except Exception:
+             # Any other secrets error
+             self.use_cloud = False
+    
+    def _init_sheets(self):
+        # 1. Data Sheet
+        try:
+            self.sheet_data = self.sh.worksheet("stock_data")
+        except:
+            self.sheet_data = self.sh.add_worksheet(title="stock_data", rows=1000, cols=20)
+            
+        # 2. Config Sheet (Stock List)
+        try:
+            self.sheet_config = self.sh.worksheet("config_symbols")
+        except:
+            self.sheet_config = self.sh.add_worksheet(title="config_symbols", rows=200, cols=1)
+            # Init with default if empty
+            if not self.sheet_config.get_all_values():
+                fallback_df = pd.DataFrame(FALLBACK_SET100, columns=["symbol"])
+                self.sheet_config.update([fallback_df.columns.values.tolist()] + fallback_df.values.tolist())
+
+    def get_symbols(self):
+        if self.use_cloud:
+            try:
+                records = self.sheet_config.get_all_records()
+                # Assuming first column is 'symbol'
+                if records:
+                    return [r['symbol'] for r in records if 'symbol' in r and r['symbol']]
+                else:
+                    # Try reading raw if header is missing or issue
+                    vals = self.sheet_config.col_values(1)
+                    return [v for v in vals if v and v.upper() != "SYMBOL"]
+            except Exception as e:
+                st.error(f"Error reading symbols from cloud: {e}")
+                return self._get_local_symbols()
+        else:
+            return self._get_local_symbols()
+
+    def _get_local_symbols(self):
+        if os.path.exists(SOURCE_FILE):
+            with open(SOURCE_FILE, "r") as f:
+                lines = [line.strip() for line in f if line.strip()]
+            
+            # Add .BK if missing
+            symbols = []
+            for s in lines:
+                if not s.upper().endswith(".BK"):
+                    symbols.append(f"{s.upper()}.BK")
+                else:
+                    symbols.append(s.upper())
+            return symbols
+        return [f"{s}.BK" for s in FALLBACK_SET100]
+
+    def save_symbols(self, symbols):
+        # Clean symbols
+        clean_symbols = [s.replace(".BK", "").strip().upper() for s in symbols]
+        
+        if self.use_cloud:
+            try:
+                # Clear and write
+                self.sheet_config.clear()
+                df = pd.DataFrame(clean_symbols, columns=["symbol"])
+                self.sheet_config.update([df.columns.values.tolist()] + df.values.tolist())
+                return True
+            except Exception as e:
+                st.error(f"Cloud Save Error: {e}")
+                return False
+        else:
+            with open(SOURCE_FILE, "w") as f:
+                for s in clean_symbols:
+                    f.write(s + "\n")
+            return True
+
+    def load_data(self):
+        if self.use_cloud:
+            try:
+                data = self.sheet_data.get_all_records()
+                if not data: return None
+                return data
+            except Exception as e:
+                # Fallback to local
+                return self._load_local_data()
+        else:
+            return self._load_local_data()
+
+    def _load_local_data(self):
+        if not os.path.exists(DATA_FILE):
+            return None
+        try:
+            with open(DATA_FILE, 'r') as f:
+                data = json.load(f)
+            return data
+        except:
+            return None
+
+    def save_data(self, data_list):
+        if self.use_cloud:
+            try:
+                # Gspread update
+                if not data_list: return
+                df = pd.DataFrame(data_list)
+                # Convert all to string or compatible types if needed, but gspread handles basic types
+                # Replace NaN with "" for Sheets
+                df = df.fillna("")
+                
+                self.sheet_data.clear()
+                self.sheet_data.update([df.columns.values.tolist()] + df.values.tolist())
+                return True
+            except Exception as e:
+                st.error(f"Cloud Save Error: {e}")
+                # Try saving local backup just in case
+                self._save_local_data(data_list)
+                return False
+        else:
+            return self._save_local_data(data_list)
+
+    def _save_local_data(self, data_list):
+        try:
+            with open(DATA_FILE, 'w') as f:
+                json.dump(data_list, f, indent=4)
+            return True
+        except:
+            return False
+            
+    def get_last_updated(self):
+        if self.use_cloud:
+            # Check a metadata cell or approximate by file mod? 
+            # Sheets doesn't give easy "last modified" via API without Drive API
+            # Let's check a specific cell we write to? 
+            # Or just assume "Cloud Data"
+            return "Cloud (Google Sheets)"
+        else:
+            if os.path.exists(DATA_FILE):
+                timestamp_mod = os.path.getmtime(DATA_FILE)
+                return datetime.datetime.fromtimestamp(timestamp_mod).strftime('%Y-%m-%d %H:%M')
+            return "Never"
+
+# Init Manager
+dm = DataManager()
+
 
 st.set_page_config(
     page_title="SET100 Magic Formula Screener",
@@ -125,23 +308,18 @@ def calculate_rsi(series, period=14):
     return 100 - (100 / (1 + rs))
 def get_set100_symbols():
     """
-    Reads SET100 symbols from external text file for easy updates.
+    Reads SET100 symbols from DataManager (Cloud or Local).
     """
-    if os.path.exists(SOURCE_FILE):
-        with open(SOURCE_FILE, "r") as f:
-            lines = [line.strip() for line in f if line.strip()]
-        
-        # Add .BK if missing
-        symbols = []
-        for s in lines:
-            if not s.upper().endswith(".BK"):
-                symbols.append(f"{s.upper()}.BK")
-            else:
-                symbols.append(s.upper())
-        return symbols
+    symbols = dm.get_symbols()
     
-    # Using fallback if file missing
-    return [f"{s}.BK" for s in FALLBACK_SET100]
+    # Ensure .BK suffix
+    final_symbols = []
+    for s in symbols:
+        if not s.upper().endswith(".BK"):
+            final_symbols.append(f"{s.upper()}.BK")
+        else:
+            final_symbols.append(s.upper())
+    return final_symbols
 
 def update_database():
     """
@@ -354,10 +532,14 @@ def update_database():
                 st.write(errors)
         return # EXIT WITHOUT SAVING
 
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data_list, f, indent=4)
+    # Save via DataManager
+    success = dm.save_data(data_list)
+    
+    if success:
+        status_text.success(f"✅ Database updated! ({len(data_list)} stocks)")
+    else:
+        status_text.error("❌ Failed to save database!")
         
-    status_text.success(f"✅ Database updated! ({len(data_list)} stocks)")
     time.sleep(2)
     status_text.empty()
     progress_bar.empty()
@@ -368,15 +550,9 @@ def load_and_validate_data():
     Phase 2: Validation
     Returns: Cleaned DataFrame or None
     """
-    if not os.path.exists(DATA_FILE):
-        return None
+    # Load via DataManager
+    data = dm.load_data()
     
-    try:
-        with open(DATA_FILE, 'r') as f:
-            data = json.load(f)
-    except:
-        return None
-        
     if not data:
         return None
         
@@ -587,10 +763,7 @@ if st.sidebar.button("Update Database"):
     update_database()
 
 # Last updated check
-last_updated = "Never"
-if os.path.exists(DATA_FILE):
-    timestamp_mod = os.path.getmtime(DATA_FILE)
-    last_updated = datetime.datetime.fromtimestamp(timestamp_mod).strftime('%Y-%m-%d %H:%M')
+last_updated = dm.get_last_updated()
 
 st.sidebar.markdown(f"**Last Updated:** {last_updated}")
 
@@ -603,13 +776,13 @@ with st.sidebar.expander("📝 Edit Stock List"):
     
     if st.button("Save List"):
         new_symbols = [s.strip().upper() for s in new_list_str.split('\n') if s.strip()]
-        # Save to file
-        with open(SOURCE_FILE, "w") as f:
-            for s in new_symbols:
-                f.write(s + "\n")
-        st.success("List saved! Please click 'Update Database' to fetch new data.")
-        time.sleep(1)
-        st.rerun()
+        # Save via DataManager
+        if dm.save_symbols(new_symbols):
+            st.success("List saved! Please click 'Update Database' to fetch new data.")
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.error("Failed to save list.")
 
 # --- FEATURE: LIQUIDITY FILTER ---
 st.sidebar.markdown("---")
@@ -799,8 +972,13 @@ else:
         )
 
         # 2. Quadrant Dividers (Benchmarks: P/E=15, ROE=12)
-        h_line = alt.Chart(pd.DataFrame({'y': [12]})).mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(y='y')
-        v_line = alt.Chart(pd.DataFrame({'x': [15]})).mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(x='x')
+        # Use alt.datum to avoid creating new datasets for static lines
+        h_line = base.mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(
+            y=alt.datum(12)
+        )
+        v_line = base.mark_rule(strokeDash=[3, 3], color='gray', opacity=0.5).encode(
+            x=alt.datum(15)
+        )
 
         # 3. Text Labels (The "Thinking" Part)
         labels_df = pd.DataFrame({
@@ -810,13 +988,21 @@ else:
             'color': ['#27ae60', '#f39c12', '#e67e22', '#c0392b']
         })
         
+        # Note: We don't inherit 'base' here because we want to swap the data source entirely
         text_labels = alt.Chart(labels_df).mark_text(
             align='center', baseline='middle', fontSize=16, fontWeight='bold'
         ).encode(
             x='x', y='y', text='label', color=alt.Color('color', scale=None)
         )
 
-        final_chart = (points + h_line + v_line + text_labels).interactive()
+        # Fix: Use alt.layer and place interactive points ON TOP (last)
+        # Add resolve_scale to handle independent color scales (Legend vs Direct Hex)
+        final_chart = alt.layer(
+            h_line, 
+            v_line, 
+            text_labels, 
+            points
+        ).resolve_scale(color='independent')
         
         st.altair_chart(final_chart, use_container_width=True)
         st.markdown("---")
